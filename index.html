@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimaMarket</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; border: none; }
+    .app { min-height: 100vh; }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 24px;
+      color: #2563eb;
+      background: transparent;
+      padding: 0;
+      white-space: nowrap;
+    }
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+    .input, .textarea, .select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: #111827;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .input:focus, .textarea:focus, .select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+    }
+    .textarea { min-height: 130px; resize: vertical; }
+    .btn {
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 700;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      white-space: nowrap;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+    }
+    .btn-primary { color: #fff; background: #2563eb; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-green { color: #fff; background: #16a34a; }
+    .btn-green:hover { background: #15803d; }
+    .btn-light { color: #1f2937; background: #eef2f7; }
+    .btn-danger { color: #fff; background: #dc2626; }
+    .main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 22px 16px 48px;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .category-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tab {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: #374151;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      font-weight: 700;
+    }
+    .tab.active { color: #fff; background: #2563eb; border-color: #2563eb; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, .12);
+      border-color: #c7d2fe;
+    }
+    .card-img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background: #e5e7eb;
+      display: block;
+    }
+    .card-body { padding: 13px; }
+    .card-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.3;
+      color: #111827;
+      min-height: 42px;
+    }
+    .price {
+      color: #16a34a;
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .meta { color: #6b7280; font-size: 13px; }
+    .panel {
+      max-width: 560px;
+      margin: 28px auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+    }
+    .panel-wide { max-width: 900px; }
+    .panel h1, .panel h2 { margin: 0 0 18px; color: #111827; }
+    .form { display: grid; gap: 12px; }
+    .auth-switch { display: flex; gap: 8px; margin-bottom: 14px; }
+    .message {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      display: none;
+    }
+    .message.error { background: #fef2f2; color: #b91c1c; }
+    .profile-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .detail {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .detail-img {
+      width: 100%;
+      border-radius: 8px;
+      background: #e5e7eb;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+    .detail-box {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .detail-title { margin: 0 0 12px; font-size: 30px; line-height: 1.15; }
+    .detail-desc { line-height: 1.6; white-space: pre-wrap; }
+    .empty {
+      padding: 28px;
+      text-align: center;
+      background: #fff;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      color: #64748b;
+    }
+    .small-link {
+      background: none;
+      color: #2563eb;
+      padding: 0;
+      font-weight: 700;
+    }
+    @media (max-width: 900px) {
+      .header-inner { grid-template-columns: 1fr; }
+      .search-row { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .detail { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr; }
+      .toolbar { align-items: stretch; }
+      .category-tabs { width: 100%; }
+      .tab { flex: 1; text-align: center; }
+      .detail-title { font-size: 24px; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-inner">
+        <button class="logo" id="logoBtn">SimaMarket</button>
+        <div class="search-row">
+          <input class="input" id="searchInput" type="search" placeholder="Поиск по объявлениям" />
+          <button class="btn btn-primary" id="searchBtn">Найти</button>
+        </div>
+        <button class="btn btn-green" id="createBtn">Подать объявление</button>
+        <button class="btn btn-light" id="authProfileBtn">Войти</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="screen active" id="homeScreen">
+        <div class="toolbar">
+          <div class="category-tabs" id="categoryTabs"></div>
+        </div>
+        <div class="grid" id="itemsGrid"></div>
+        <div class="empty" id="emptyHome" style="display:none;">Объявления не найдены</div>
+      </section>
+
+      <section class="screen" id="authScreen">
+        <div class="panel">
+          <h1 id="authTitle">Вход</h1>
+          <div class="auth-switch">
+            <button class="btn btn-primary" id="loginModeBtn">Вход</button>
+            <button class="btn btn-light" id="registerModeBtn">Регистрация</button>
+          </div>
+          <form class="form" id="authForm">
+            <input class="input" id="authEmail" type="email" placeholder="Email" required />
+            <input class="input" id="authPassword" type="password" placeholder="Пароль" minlength="6" required />
+            <button class="btn btn-green" type="submit" id="authSubmitBtn">Войти</button>
+          </form>
+          <div class="message" id="authMessage"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="profileScreen">
+        <div class="panel panel-wide">
+          <div class="profile-head">
+            <div>
+              <h1>Личный кабинет</h1>
+              <div class="meta" id="profileEmail"></div>
+            </div>
+            <button class="btn btn-danger" id="logoutBtn">Выйти</button>
+          </div>
+          <h2>Мои объявления</h2>
+          <div class="grid" id="profileItemsGrid"></div>
+          <div class="empty" id="emptyProfile" style="display:none;">У вас пока нет объявлений</div>
+        </div>
+      </section>
+
+      <section class="screen" id="createScreen">
+        <div class="panel">
+          <h1>Новое объявление</h1>
+          <form class="form" id="createForm">
+            <input class="input" id="itemTitle" type="text" placeholder="Название" required maxlength="120" />
+            <input class="input" id="itemPrice" type="number" placeholder="Цена" required min="0" step="1" />
+            <select class="select" id="itemCategory" required></select>
+            <textarea class="textarea" id="itemDescription" placeholder="Описание" required maxlength="2000"></textarea>
+            <input class="input" id="itemImageUrl" type="url" placeholder="Ссылка на фото" />
+            <button class="btn btn-green" type="submit">Опубликовать</button>
+          </form>
+          <div class="message" id="createMessage"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="detailScreen">
+        <button class="small-link" id="backHomeBtn">Назад к объявлениям</button>
+        <div style="height:16px;"></div>
+        <div class="detail" id="detailContent"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const SUPABASE_URL = "https://ywzcscokzevgcttpinbj.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_oJh3wGp2sMh-h5fLgob-bg_Tjp_r-pc";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const categories = ["Все", "Транспорт", "Недвижимость", "Электроника", "Одежда", "Дом", "Услуги", "Работа", "Хобби"];
+    let currentUser = null;
+    let currentCategory = "Все";
+    let authMode = "login";
+
+    const screens = {
+      home: document.getElementById("homeScreen"),
+      auth: document.getElementById("authScreen"),
+      profile: document.getElementById("profileScreen"),
+      create: document.getElementById("createScreen"),
+      detail: document.getElementById("detailScreen")
+    };
+
+    const itemsGrid = document.getElementById("itemsGrid");
+    const profileItemsGrid = document.getElementById("profileItemsGrid");
+    const categoryTabs = document.getElementById("categoryTabs");
+    const searchInput = document.getElementById("searchInput");
+    const emptyHome = document.getElementById("emptyHome");
+    const emptyProfile = document.getElementById("emptyProfile");
+    const authProfileBtn = document.getElementById("authProfileBtn");
+    const createBtn = document.getElementById("createBtn");
+    const createForm = document.getElementById("createForm");
+    const itemCategory = document.getElementById("itemCategory");
+    const detailContent = document.getElementById("detailContent");
+
+    function showScreen(name) {
+      Object.values(screens).forEach(screen => screen.classList.remove("active"));
+      screens[name].classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showMessage(element, text, isError = false) {
+      element.textContent = text;
+      element.className = isError ? "message error" : "message";
+      element.style.display = "block";
+    }
+
+    function hideMessage(element) {
+      element.textContent = "";
+      element.style.display = "none";
+    }
+
+    function formatPrice(value) {
+      return new Intl.NumberFormat("ru-RU", {
+        style: "currency",
+        currency: "RUB",
+        maximumFractionDigits: 0
+      }).format(Number(value || 0));
+    }
+
+    function safeImage(url) {
+      return url && url.trim()
+        ? url.trim()
+        : "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderCategoryTabs() {
+      categoryTabs.innerHTML = "";
+      categories.forEach(category => {
+        const button = document.createElement("button");
+        button.className = category === currentCategory ? "tab active" : "tab";
+        button.textContent = category;
+        button.addEventListener("click", async () => {
+          currentCategory = category;
+          renderCategoryTabs();
+          await loadItems();
+        });
+        categoryTabs.appendChild(button);
+      });
+    }
+
+    function renderCategoryOptions() {
+      itemCategory.innerHTML = "";
+      categories.filter(category => category !== "Все").forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        itemCategory.appendChild(option);
+      });
+    }
+
+    function createItemCard(item) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.tabIndex = 0;
+      card.innerHTML = `
+        <img class="card-img" src="${escapeHtml(safeImage(item.image_url))}" alt="${escapeHtml(item.title)}">
+        <div class="card-body">
+          <h3 class="card-title">${escapeHtml(item.title)}</h3>
+          <div class="price">${formatPrice(item.price)}</div>
+          <div class="meta">${escapeHtml(item.category)}</div>
+        </div>
+      `;
+      card.addEventListener("click", () => loadItemDetail(item.id));
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter") loadItemDetail(item.id);
+      });
+      return card;
+    }
+
+    async function loadItems() {
+      itemsGrid.innerHTML = "";
+      emptyHome.style.display = "none";
+
+      let query = supabase.from("items").select("*").order("created_at", { ascending: false });
+      const search = searchInput.value.trim();
+
+      if (search) query = query.ilike("title", `%${search}%`);
+      if (currentCategory !== "Все") query = query.eq("category", currentCategory);
+
+      const { data, error } = await query;
+      if (error) {
+        emptyHome.textContent = "Ошибка загрузки объявлений: " + error.message;
+        emptyHome.style.display = "block";
+        return;
+      }
+      if (!data || data.length === 0) {
+        emptyHome.textContent = "Объявления не найдены";
+        emptyHome.style.display = "block";
+        return;
+      }
+      data.forEach(item => itemsGrid.appendChild(createItemCard(item)));
+    }
+
+    async function loadProfileItems() {
+      profileItemsGrid.innerHTML = "";
+      emptyProfile.style.display = "none";
+
+      if (!currentUser) {
+        showScreen("auth");
+        return;
+      }
+
+      document.getElementById("profileEmail").textContent = currentUser.email;
+      const { data, error } = await supabase
+        .from("items")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        emptyProfile.textContent = "Ошибка загрузки ваших объявлений: " + error.message;
+        emptyProfile.style.display = "block";
+        return;
+      }
+      if (!data || data.length === 0) {
+        emptyProfile.textContent = "У вас пока нет объявлений";
+        emptyProfile.style.display = "block";
+        return;
+      }
+      data.forEach(item => profileItemsGrid.appendChild(createItemCard(item)));
+    }
+
+    async function loadItemDetail(id) {
+      detailContent.innerHTML = "<div class='empty'>Загрузка объявления...</div>";
+      showScreen("detail");
+
+      const { data, error } = await supabase.from("items").select("*").eq("id", id).single();
+      if (error) {
+        detailContent.innerHTML = `<div class="empty">Ошибка загрузки: ${escapeHtml(error.message)}</div>`;
+        return;
+      }
+
+      detailContent.innerHTML = `
+        <img class="detail-img" src="${escapeHtml(safeImage(data.image_url))}" alt="${escapeHtml(data.title)}">
+        <div class="detail-box">
+          <h1 class="detail-title">${escapeHtml(data.title)}</h1>
+          <div class="price">${formatPrice(data.price)}</div>
+          <p class="meta">Категория: ${escapeHtml(data.category)}</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0;">
+          <div class="detail-desc">${escapeHtml(data.description)}</div>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0;">
+          <h2 style="margin:0 0 10px;">Контакты продавца</h2>
+          <p class="meta">ID продавца:</p>
+          <p style="word-break:break-all;margin-top:4px;">${escapeHtml(data.user_id)}</p>
+          <p class="meta">Для тестовой версии контакт привязан к аккаунту Supabase.</p>
+        </div>
+      `;
+    }
+
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+      const message = document.getElementById("authMessage");
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      hideMessage(message);
+
+      if (authMode === "register") {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          showMessage(message, error.message, true);
+          return;
+        }
+        showMessage(message, "Регистрация успешна. Если в Supabase включено подтверждение email, проверьте почту.");
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        showMessage(message, error.message, true);
+        return;
+      }
+
+      showMessage(message, "Вход выполнен");
+      showScreen("home");
+      await loadItems();
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      const isLogin = mode === "login";
+      document.getElementById("authTitle").textContent = isLogin ? "Вход" : "Регистрация";
+      document.getElementById("authSubmitBtn").textContent = isLogin ? "Войти" : "Зарегистрироваться";
+      document.getElementById("loginModeBtn").className = isLogin ? "btn btn-primary" : "btn btn-light";
+      document.getElementById("registerModeBtn").className = isLogin ? "btn btn-light" : "btn btn-primary";
+      hideMessage(document.getElementById("authMessage"));
+    }
+
+    async function handleCreateSubmit(event) {
+      event.preventDefault();
+      const message = document.getElementById("createMessage");
+      hideMessage(message);
+
+      if (!currentUser) {
+        showMessage(message, "Чтобы подать объявление, сначала войдите в аккаунт.", true);
+        showScreen("auth");
+        return;
+      }
+
+      const payload = {
+        title: document.getElementById("itemTitle").value.trim(),
+        price: Number(document.getElementById("itemPrice").value),
+        category: document.getElementById("itemCategory").value,
+        description: document.getElementById("itemDescription").value.trim(),
+        image_url: document.getElementById("itemImageUrl").value.trim() || null,
+        user_id: currentUser.id
+      };
+
+      const { error } = await supabase.from("items").insert(payload);
+      if (error) {
+        showMessage(message, error.message, true);
+        return;
+      }
+
+      createForm.reset();
+      showMessage(message, "Объявление опубликовано");
+      currentCategory = "Все";
+      renderCategoryTabs();
+      await loadItems();
+      showScreen("home");
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      currentUser = null;
+      authProfileBtn.textContent = "Войти";
+      showScreen("home");
+      await loadItems();
+    }
+
+    function bindEvents() {
+      document.getElementById("logoBtn").addEventListener("click", async () => {
+        showScreen("home");
+        await loadItems();
+      });
+      document.getElementById("searchBtn").addEventListener("click", loadItems);
+      searchInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") loadItems();
+      });
+      createBtn.addEventListener("click", () => {
+        if (!currentUser) {
+          showScreen("auth");
+          return;
+        }
+        hideMessage(document.getElementById("createMessage"));
+        showScreen("create");
+      });
+      authProfileBtn.addEventListener("click", async () => {
+        if (!currentUser) {
+          showScreen("auth");
+          return;
+        }
+        await loadProfileItems();
+        showScreen("profile");
+      });
+      document.getElementById("authForm").addEventListener("submit", handleAuthSubmit);
+      document.getElementById("loginModeBtn").addEventListener("click", () => setAuthMode("login"));
+      document.getElementById("registerModeBtn").addEventListener("click", () => setAuthMode("register"));
+      document.getElementById("logoutBtn").addEventListener("click", logout);
+      document.getElementById("backHomeBtn").addEventListener("click", () => showScreen("home"));
+      createForm.addEventListener("submit", handleCreateSubmit);
+    }
+
+    async function initSession() {
+      const { data } = await supabase.auth.getSession();
+      currentUser = data.session?.user || null;
+      authProfileBtn.textContent = currentUser ? "Профиль" : "Войти";
+      supabase.auth.onAuthStateChange((_event, session) => {
+        currentUser = session?.user || null;
+        authProfileBtn.textContent = currentUser ? "Профиль" : "Войти";
+      });
+    }
+
+    async function init() {
+      renderCategoryTabs();
+      renderCategoryOptions();
+      bindEvents();
+      setAuthMode("login");
+      await initSession();
+      await loadItems();
+    }
+
+    init();
+  </script>
+</body>
+</html>
