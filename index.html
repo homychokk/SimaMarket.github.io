@@ -639,6 +639,62 @@
       border: 1px solid var(--line);
     }
 
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .profile-card {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+    }
+
+    .avatar {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      border: 4px solid #fff;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .profile-name {
+      margin: 0 0 4px;
+      font-size: 22px;
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+    }
+
+    .seller-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .seller-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      border: 3px solid #fff;
+      box-shadow: var(--soft-shadow);
+      flex: 0 0 auto;
+    }
+
     .empty {
       padding: 30px;
       text-align: center;
@@ -763,6 +819,10 @@
       }
 
       .detail {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-layout {
         grid-template-columns: 1fr;
       }
     }
@@ -891,9 +951,41 @@
             <button class="btn btn-danger" id="logoutBtn" type="button"><i data-lucide="log-out"></i> Выйти</button>
           </div>
 
-          <h2>Мои объявления</h2>
-          <div class="grid" id="profileItemsGrid"></div>
-          <div class="empty" id="emptyProfile" style="display:none;">У вас пока нет объявлений</div>
+          <div class="profile-layout">
+            <aside class="profile-card">
+              <div class="avatar-row">
+                <img class="avatar" id="profileAvatarPreview" alt="Аватар профиля">
+                <div>
+                  <h2 class="profile-name" id="profileNamePreview">Продавец</h2>
+                  <div class="meta" id="profileCityPreview">Город не указан</div>
+                </div>
+              </div>
+              <form class="form" id="profileForm">
+                <label class="label">Ник
+                  <input class="input" id="profileUsername" type="text" placeholder="Например: homychokk" maxlength="40" required />
+                </label>
+                <label class="label">Ссылка на аватар
+                  <input class="input" id="profileAvatar" type="url" placeholder="https://example.com/avatar.jpg" />
+                </label>
+                <label class="label">Телефон
+                  <input class="input" id="profilePhone" type="tel" placeholder="+375 29 000-00-00" />
+                </label>
+                <label class="label">Город
+                  <input class="input" id="profileCity" type="text" placeholder="Минск" maxlength="60" />
+                </label>
+                <label class="label">О себе
+                  <textarea class="textarea" id="profileBio" placeholder="Коротко о продавце" maxlength="500"></textarea>
+                </label>
+                <button class="btn btn-primary" type="submit"><i data-lucide="save"></i> Сохранить профиль</button>
+              </form>
+            </aside>
+
+            <section>
+              <h2>Мои объявления</h2>
+              <div class="grid" id="profileItemsGrid"></div>
+              <div class="empty" id="emptyProfile" style="display:none;">У вас пока нет объявлений</div>
+            </section>
+          </div>
         </div>
       </section>
 
@@ -955,8 +1047,61 @@
     ];
 
     let currentUser = null;
+    let currentProfile = null;
     let currentCategory = "Все";
     let authMode = "login";
+    let pendingScreenAfterAuth = null;
+
+    const demoItems = [
+      {
+        id: "demo-iphone",
+        is_demo: true,
+        created_at: new Date().toISOString(),
+        title: "iPhone 15 Pro 256 GB, натуральный титан",
+        description: "Идеальное состояние, полный комплект, батарея 98%. Покупался для себя, чек и коробка на месте. Возможна встреча в центре.",
+        price: 3499,
+        category: "Электроника",
+        image_url: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1200&q=80",
+        user_id: "demo-seller-1",
+        seller: { username: "TechRoom", avatar_url: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=300&q=80", phone: "+375 29 111-22-33", city: "Минск", bio: "Проверенная электроника и честное описание состояния." }
+      },
+      {
+        id: "demo-bike",
+        is_demo: true,
+        created_at: new Date(Date.now() - 86400000).toISOString(),
+        title: "Горный велосипед Trek Marlin 7",
+        description: "Рама M, гидравлические тормоза, переключение без нареканий. После ТО, катался один сезон.",
+        price: 1450,
+        category: "Транспорт",
+        image_url: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1200&q=80",
+        user_id: "demo-seller-2",
+        seller: { username: "RideStore", avatar_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80", phone: "+375 44 555-81-12", city: "Минск", bio: "Велосипеды, самокаты и аксессуары." }
+      },
+      {
+        id: "demo-sofa",
+        is_demo: true,
+        created_at: new Date(Date.now() - 172800000).toISOString(),
+        title: "Диван Copenhagen, серый велюр",
+        description: "Большой мягкий диван без пятен и повреждений. Размер 230 см, раскладывается, есть ниша для белья.",
+        price: 890,
+        category: "Дом",
+        image_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
+        user_id: "demo-seller-3",
+        seller: { username: "Nord Home", avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80", phone: "+375 25 777-64-90", city: "Гродно", bio: "Мебель и уютные вещи для дома." }
+      },
+      {
+        id: "demo-flat",
+        is_demo: true,
+        created_at: new Date(Date.now() - 259200000).toISOString(),
+        title: "1-комнатная квартира у метро",
+        description: "Светлая квартира после ремонта. 5 минут до метро, новая техника, тихий двор. Можно с животными по договоренности.",
+        price: 1250,
+        category: "Недвижимость",
+        image_url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
+        user_id: "demo-seller-4",
+        seller: { username: "City Rent", avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80", phone: "+375 33 900-10-10", city: "Минск", bio: "Аренда без лишней суеты." }
+      }
+    ];
 
     const screens = {
       home: document.getElementById("homeScreen"),
@@ -979,6 +1124,7 @@
     const detailContent = document.getElementById("detailContent");
     const itemsCounter = document.getElementById("itemsCounter");
     const toastRoot = document.getElementById("toast");
+    const profileForm = document.getElementById("profileForm");
 
     function refreshIcons() {
       if (window.lucide) {
@@ -1034,6 +1180,16 @@
         : "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80";
     }
 
+    function safeAvatar(url, seed = "seller") {
+      return url && url.trim()
+        ? url.trim()
+        : `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(seed)}&backgroundColor=2563eb,10b981&textColor=ffffff`;
+    }
+
+    function defaultUsername(user) {
+      return user?.email ? user.email.split("@")[0] : "Новый продавец";
+    }
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -1071,6 +1227,65 @@
         `;
         target.appendChild(node);
       }
+    }
+
+    async function getOrCreateProfile(user) {
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error && error.code !== "PGRST116") {
+        toast("Профиль пока не загрузился: " + error.message, true);
+        return {
+          id: user.id,
+          username: defaultUsername(user),
+          avatar_url: "",
+          phone: "",
+          city: "",
+          bio: ""
+        };
+      }
+
+      if (data) return data;
+
+      const profile = {
+        id: user.id,
+        username: user.user_metadata?.username || defaultUsername(user),
+        avatar_url: user.user_metadata?.avatar_url || "",
+        phone: "",
+        city: "",
+        bio: ""
+      };
+
+      const { data: inserted, error: insertError } = await supabase
+        .from("profiles")
+        .insert(profile)
+        .select("*")
+        .single();
+
+      if (insertError) {
+        toast("Не удалось создать профиль: " + insertError.message, true);
+        return profile;
+      }
+
+      return inserted;
+    }
+
+    function fillProfileForm(profile) {
+      if (!profile) return;
+
+      document.getElementById("profileUsername").value = profile.username || "";
+      document.getElementById("profileAvatar").value = profile.avatar_url || "";
+      document.getElementById("profilePhone").value = profile.phone || "";
+      document.getElementById("profileCity").value = profile.city || "";
+      document.getElementById("profileBio").value = profile.bio || "";
+      document.getElementById("profileNamePreview").textContent = profile.username || "Продавец";
+      document.getElementById("profileCityPreview").textContent = profile.city || "Город не указан";
+      document.getElementById("profileAvatarPreview").src = safeAvatar(profile.avatar_url, profile.username || "seller");
     }
 
     function renderCategoryTabs() {
@@ -1160,9 +1375,22 @@
       }
 
       if (!data || data.length === 0) {
-        itemsCounter.textContent = "0 объявлений";
-        emptyHome.textContent = "Объявления не найдены";
-        emptyHome.style.display = "block";
+        const filteredDemo = demoItems.filter(item => {
+          const matchesCategory = currentCategory === "Все" || item.category === currentCategory;
+          const matchesSearch = !search || item.title.toLowerCase().includes(search.toLowerCase());
+          return matchesCategory && matchesSearch;
+        });
+
+        if (filteredDemo.length === 0) {
+          itemsCounter.textContent = "0 объявлений";
+          emptyHome.textContent = "Объявления не найдены";
+          emptyHome.style.display = "block";
+          return;
+        }
+
+        itemsCounter.textContent = `${filteredDemo.length} демо-${getPlural(filteredDemo.length, "объявление", "объявления", "объявлений")}`;
+        filteredDemo.forEach(item => itemsGrid.appendChild(createItemCard(item)));
+        refreshIcons();
         return;
       }
 
@@ -1189,6 +1417,10 @@
       }
 
       document.getElementById("profileEmail").textContent = currentUser.email;
+      if (!currentProfile) {
+        currentProfile = await getOrCreateProfile(currentUser);
+      }
+      fillProfileForm(currentProfile);
       renderSkeleton(profileItemsGrid, 4);
 
       const { data, error } = await supabase
@@ -1220,6 +1452,12 @@
       detailContent.innerHTML = "<div class='empty'>Загрузка объявления...</div>";
       showScreen("detail");
 
+      const demoItem = demoItems.find(item => item.id === id);
+      if (demoItem) {
+        renderItemDetail(demoItem, demoItem.seller);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("items")
         .select("*")
@@ -1232,6 +1470,27 @@
         return;
       }
 
+      const seller = await loadSellerProfile(data.user_id);
+      renderItemDetail(data, seller);
+    }
+
+    async function loadSellerProfile(userId) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+
+      return data || {
+        username: "Продавец SimaMarket",
+        avatar_url: "",
+        phone: "",
+        city: "",
+        bio: ""
+      };
+    }
+
+    function renderItemDetail(data, seller) {
       detailContent.innerHTML = `
         <img class="detail-img" src="${escapeHtml(safeImage(data.image_url))}" alt="${escapeHtml(data.title)}">
         <div class="detail-box">
@@ -1242,7 +1501,15 @@
           <div style="height:18px;"></div>
           <div class="detail-desc">${escapeHtml(data.description)}</div>
           <div class="seller-box">
-            <h2 style="margin:0;">Продавец</h2>
+            <div class="seller-head">
+              <img class="seller-avatar" src="${escapeHtml(safeAvatar(seller?.avatar_url, seller?.username || data.user_id))}" alt="${escapeHtml(seller?.username || "Продавец")}">
+              <div>
+                <h2 style="margin:0;">${escapeHtml(seller?.username || "Продавец SimaMarket")}</h2>
+                <div class="meta">${escapeHtml(seller?.city || "Город не указан")}</div>
+              </div>
+            </div>
+            ${seller?.bio ? `<div class="detail-desc">${escapeHtml(seller.bio)}</div>` : ""}
+            ${seller?.phone ? `<a class="btn btn-green" href="tel:${escapeHtml(seller.phone)}"><i data-lucide="phone"></i> ${escapeHtml(seller.phone)}</a>` : ""}
             <div class="seller-id">${escapeHtml(data.user_id)}</div>
             <button class="btn btn-primary" type="button" id="copySellerBtn"><i data-lucide="copy"></i> Скопировать ID продавца</button>
           </div>
@@ -1269,13 +1536,32 @@
       setButtonLoading(submitButton, true, authMode === "register" ? "Создаем" : "Входим");
 
       if (authMode === "register") {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              username: email.split("@")[0]
+            }
+          }
+        });
         setButtonLoading(submitButton, false);
 
         if (error) {
           showMessage(message, error.message, true);
           toast(error.message, true);
           return;
+        }
+
+        if (data.session?.user) {
+          currentUser = data.session.user;
+          currentProfile = await getOrCreateProfile(currentUser);
+          toast("Аккаунт создан");
+          if (pendingScreenAfterAuth === "create") {
+            pendingScreenAfterAuth = null;
+            showScreen("create");
+            return;
+          }
         }
 
         showMessage(message, "Регистрация успешна. Если включено подтверждение email, проверьте почту.");
@@ -1292,8 +1578,17 @@
         return;
       }
 
+      const { data: userData } = await supabase.auth.getUser();
+      currentUser = userData.user || currentUser;
+      currentProfile = await getOrCreateProfile(currentUser);
       showMessage(message, "Вход выполнен");
       toast("Вы вошли в аккаунт");
+      if (pendingScreenAfterAuth === "create") {
+        pendingScreenAfterAuth = null;
+        hideMessage(document.getElementById("createMessage"));
+        showScreen("create");
+        return;
+      }
       showScreen("home");
       await loadItems();
     }
@@ -1355,9 +1650,47 @@
       showScreen("home");
     }
 
+    async function handleProfileSubmit(event) {
+      event.preventDefault();
+
+      if (!currentUser) {
+        showScreen("auth");
+        return;
+      }
+
+      const submitButton = profileForm.querySelector("button[type='submit']");
+      const payload = {
+        id: currentUser.id,
+        username: document.getElementById("profileUsername").value.trim() || defaultUsername(currentUser),
+        avatar_url: document.getElementById("profileAvatar").value.trim() || null,
+        phone: document.getElementById("profilePhone").value.trim() || null,
+        city: document.getElementById("profileCity").value.trim() || null,
+        bio: document.getElementById("profileBio").value.trim() || null,
+        updated_at: new Date().toISOString()
+      };
+
+      setButtonLoading(submitButton, true, "Сохраняем");
+      const { data, error } = await supabase
+        .from("profiles")
+        .upsert(payload)
+        .select("*")
+        .single();
+      setButtonLoading(submitButton, false);
+
+      if (error) {
+        toast(error.message, true);
+        return;
+      }
+
+      currentProfile = data;
+      fillProfileForm(currentProfile);
+      toast("Профиль обновлен");
+    }
+
     async function logout() {
       await supabase.auth.signOut();
       currentUser = null;
+      currentProfile = null;
       authProfileBtn.innerHTML = `<i data-lucide="user"></i> Войти`;
       toast("Вы вышли из аккаунта");
       showScreen("home");
@@ -1378,6 +1711,7 @@
 
       createBtn.addEventListener("click", () => {
         if (!currentUser) {
+          pendingScreenAfterAuth = "create";
           toast("Сначала войдите в аккаунт");
           showScreen("auth");
           return;
@@ -1403,17 +1737,31 @@
       document.getElementById("logoutBtn").addEventListener("click", logout);
       document.getElementById("backHomeBtn").addEventListener("click", () => showScreen("home"));
       createForm.addEventListener("submit", handleCreateSubmit);
+      profileForm.addEventListener("submit", handleProfileSubmit);
+      ["profileUsername", "profileAvatar", "profileCity"].forEach(id => {
+        document.getElementById(id).addEventListener("input", () => {
+          fillProfileForm({
+            username: document.getElementById("profileUsername").value,
+            avatar_url: document.getElementById("profileAvatar").value,
+            phone: document.getElementById("profilePhone").value,
+            city: document.getElementById("profileCity").value,
+            bio: document.getElementById("profileBio").value
+          });
+        });
+      });
     }
 
     async function initSession() {
       const { data } = await supabase.auth.getSession();
       currentUser = data.session?.user || null;
+      currentProfile = currentUser ? await getOrCreateProfile(currentUser) : null;
       authProfileBtn.innerHTML = currentUser
         ? `<i data-lucide="circle-user-round"></i> Профиль`
         : `<i data-lucide="user"></i> Войти`;
 
-      supabase.auth.onAuthStateChange((_event, session) => {
+      supabase.auth.onAuthStateChange(async (_event, session) => {
         currentUser = session?.user || null;
+        currentProfile = currentUser ? await getOrCreateProfile(currentUser) : null;
         authProfileBtn.innerHTML = currentUser
           ? `<i data-lucide="circle-user-round"></i> Профиль`
           : `<i data-lucide="user"></i> Войти`;
