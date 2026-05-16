@@ -695,6 +695,133 @@
       flex: 0 0 auto;
     }
 
+    .promo-box {
+      display: grid;
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .promo-hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .casino-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, .62);
+      backdrop-filter: blur(12px);
+    }
+
+    .casino-modal.active {
+      display: flex;
+      animation: fadeUp .18s ease both;
+    }
+
+    .casino-card {
+      width: min(520px, 100%);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(245, 158, 11, .28), transparent 30%),
+        radial-gradient(circle at 82% 12%, rgba(16, 185, 129, .22), transparent 32%),
+        #0f172a;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .16);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, .36);
+    }
+
+    .casino-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .casino-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: rgba(255, 255, 255, .12);
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, .2);
+      transform: translateY(-1px);
+    }
+
+    .casino-body {
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .slot {
+      min-height: 112px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-size: clamp(38px, 11vw, 58px);
+      background: linear-gradient(180deg, #fff, #e2e8f0);
+      color: #0f172a;
+      border: 1px solid rgba(255, 255, 255, .32);
+      box-shadow: inset 0 -10px 24px rgba(15, 23, 42, .14), 0 16px 28px rgba(0, 0, 0, .18);
+    }
+
+    .slot.spinning {
+      animation: slotShake .12s linear infinite;
+    }
+
+    @keyframes slotShake {
+      0% { transform: translateY(0); filter: blur(0); }
+      50% { transform: translateY(-4px); filter: blur(1px); }
+      100% { transform: translateY(3px); filter: blur(0); }
+    }
+
+    .casino-result {
+      min-height: 52px;
+      padding: 13px;
+      border-radius: var(--radius);
+      color: #dbeafe;
+      background: rgba(255, 255, 255, .09);
+      border: 1px solid rgba(255, 255, 255, .12);
+      font-weight: 800;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .casino-note {
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
     .empty {
       padding: 30px;
       text-align: center;
@@ -978,6 +1105,13 @@
                 </label>
                 <button class="btn btn-primary" type="submit"><i data-lucide="save"></i> Сохранить профиль</button>
               </form>
+              <div class="promo-box">
+                <label class="label">Промо для друзей
+                  <input class="input" id="promoCodeInput" type="text" placeholder="Введите промо-код" maxlength="20" />
+                </label>
+                <button class="btn btn-green" id="promoCodeBtn" type="button"><i data-lucide="ticket-check"></i> Активировать</button>
+                <div class="promo-hint">Секретный режим для шутки. Реальных денег и выплат тут нет.</div>
+              </div>
             </aside>
 
             <section>
@@ -1024,6 +1158,28 @@
     </main>
 
     <div class="toast" id="toast"></div>
+
+    <div class="casino-modal" id="casinoModal" aria-hidden="true">
+      <div class="casino-card">
+        <div class="casino-head">
+          <div>
+            <h2 class="casino-title">SIMA Spin</h2>
+            <div class="promo-hint">закрытый промо-режим</div>
+          </div>
+          <button class="icon-btn" id="casinoCloseBtn" type="button" aria-label="Закрыть"><i data-lucide="x"></i></button>
+        </div>
+        <div class="casino-body">
+          <div class="slots" aria-label="Слоты">
+            <div class="slot" id="slotOne">7</div>
+            <div class="slot" id="slotTwo">S</div>
+            <div class="slot" id="slotThree">₽</div>
+          </div>
+          <button class="btn btn-green" id="spinBtn" type="button"><i data-lucide="rotate-cw"></i> Крутить</button>
+          <div class="casino-result" id="casinoResult">Введите SIMA67 в профиле и крутаните барабаны.</div>
+          <div class="casino-note">Это пасхалка для друзей: виртуальные рубли, без реальных ставок, депозитов и выплат.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -1125,6 +1281,18 @@
     const itemsCounter = document.getElementById("itemsCounter");
     const toastRoot = document.getElementById("toast");
     const profileForm = document.getElementById("profileForm");
+    const promoCodeInput = document.getElementById("promoCodeInput");
+    const promoCodeBtn = document.getElementById("promoCodeBtn");
+    const casinoModal = document.getElementById("casinoModal");
+    const casinoResult = document.getElementById("casinoResult");
+    const spinBtn = document.getElementById("spinBtn");
+    const slotNodes = [
+      document.getElementById("slotOne"),
+      document.getElementById("slotTwo"),
+      document.getElementById("slotThree")
+    ];
+    const slotSymbols = ["7", "S", "₽", "★", "💎", "BAR", "67"];
+    const promoPrizes = [100, 250, 500, 777, 1200, 2026, 3000, 5000, 6666];
 
     function refreshIcons() {
       if (window.lucide) {
@@ -1687,6 +1855,58 @@
       toast("Профиль обновлен");
     }
 
+    function openCasino() {
+      casinoModal.classList.add("active");
+      casinoModal.setAttribute("aria-hidden", "false");
+      casinoResult.textContent = "Промо SIMA67 активирован. Крути барабаны.";
+      refreshIcons();
+    }
+
+    function closeCasino() {
+      casinoModal.classList.remove("active");
+      casinoModal.setAttribute("aria-hidden", "true");
+    }
+
+    function activatePromo() {
+      const code = promoCodeInput.value.trim().toUpperCase();
+      if (code !== "SIMA67") {
+        toast("Промо-код не найден", true);
+        return;
+      }
+
+      toast("Секретный режим открыт");
+      openCasino();
+    }
+
+    function spinCasino() {
+      setButtonLoading(spinBtn, true, "Крутим");
+      casinoResult.textContent = "Барабаны набирают скорость...";
+      slotNodes.forEach(node => node.classList.add("spinning"));
+
+      let ticks = 0;
+      const timer = setInterval(() => {
+        ticks += 1;
+        slotNodes.forEach(node => {
+          node.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        });
+
+        if (ticks >= 24) {
+          clearInterval(timer);
+          const prize = promoPrizes[Math.floor(Math.random() * promoPrizes.length)];
+          const finalSymbols = prize === 6666 ? ["6", "6", "6"] : ["S", "I", "M"];
+
+          slotNodes.forEach((node, index) => {
+            node.classList.remove("spinning");
+            node.textContent = finalSymbols[index];
+          });
+
+          setButtonLoading(spinBtn, false);
+          casinoResult.textContent = `Виртуальный выигрыш: ${formatPrice(prize)} на фан-баланс. Это шутка, не настоящая выплата.`;
+          toast(`SIMA Spin: ${formatPrice(prize)} виртуально`);
+        }
+      }, 80);
+    }
+
     async function logout() {
       await supabase.auth.signOut();
       currentUser = null;
@@ -1738,6 +1958,18 @@
       document.getElementById("backHomeBtn").addEventListener("click", () => showScreen("home"));
       createForm.addEventListener("submit", handleCreateSubmit);
       profileForm.addEventListener("submit", handleProfileSubmit);
+      promoCodeBtn.addEventListener("click", activatePromo);
+      promoCodeInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          activatePromo();
+        }
+      });
+      document.getElementById("casinoCloseBtn").addEventListener("click", closeCasino);
+      casinoModal.addEventListener("click", event => {
+        if (event.target === casinoModal) closeCasino();
+      });
+      spinBtn.addEventListener("click", spinCasino);
       ["profileUsername", "profileAvatar", "profileCity"].forEach(id => {
         document.getElementById(id).addEventListener("input", () => {
           fillProfileForm({
