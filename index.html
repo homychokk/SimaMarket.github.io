@@ -22,6 +22,8 @@
       --shadow: 0 18px 45px rgba(15, 23, 42, .10);
       --soft-shadow: 0 10px 28px rgba(15, 23, 42, .08);
       --radius: 8px;
+      --mx: 50%;
+      --my: 18%;
     }
 
     * { box-sizing: border-box; }
@@ -32,10 +34,42 @@
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       background:
+        radial-gradient(circle at var(--mx) var(--my), rgba(37, 99, 235, .18), transparent 260px),
+        radial-gradient(circle at calc(100% - var(--mx)) calc(var(--my) + 18%), rgba(16, 185, 129, .14), transparent 260px),
         linear-gradient(180deg, #eef5ff 0, rgba(238, 245, 255, 0) 310px),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(37, 99, 235, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 99, 235, .055) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0, transparent 58%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      left: var(--mx);
+      top: var(--my);
+      z-index: -1;
+      pointer-events: none;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 255, 255, .82), rgba(255, 255, 255, 0) 64%);
+      opacity: .72;
+      transition: opacity .2s ease;
     }
 
     button,
@@ -248,6 +282,8 @@
     }
 
     .hero-strip {
+      position: relative;
+      overflow: hidden;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 18px;
@@ -260,6 +296,41 @@
       border: 1px solid rgba(191, 219, 254, .8);
       border-radius: var(--radius);
       box-shadow: var(--soft-shadow);
+    }
+
+    .hero-strip::before,
+    .hero-strip::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 124px;
+      border-radius: var(--radius);
+      background-size: cover;
+      background-position: center;
+      border: 4px solid rgba(255, 255, 255, .72);
+      box-shadow: 0 18px 34px rgba(15, 23, 42, .16);
+      opacity: .58;
+      pointer-events: none;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+
+    .hero-strip::before {
+      right: 94px;
+      top: -46px;
+      transform: rotate(8deg) translate(calc((var(--mx) - 50%) / 32), calc((var(--my) - 50%) / 28));
+      background-image: url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80");
+    }
+
+    .hero-strip::after {
+      right: -44px;
+      bottom: -38px;
+      transform: rotate(-10deg) translate(calc((50% - var(--mx)) / 34), calc((50% - var(--my)) / 30));
+      background-image: url("https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=80");
+    }
+
+    .hero-strip:hover::before,
+    .hero-strip:hover::after {
+      opacity: .78;
     }
 
     .hero-title {
@@ -374,18 +445,37 @@
     }
 
     .card {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform .16s ease, box-shadow .2s ease, border-color .2s ease;
       box-shadow: 0 1px 0 rgba(15, 23, 42, .04);
     }
 
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(circle at var(--card-x, 50%) var(--card-y, 35%), rgba(255, 255, 255, .62), transparent 34%);
+      opacity: 0;
+      transition: opacity .18s ease;
+      mix-blend-mode: soft-light;
+    }
+
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-7px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
       box-shadow: var(--shadow);
       border-color: #bfdbfe;
+    }
+
+    .card:hover::before {
+      opacity: 1;
     }
 
     .card-media {
@@ -404,6 +494,28 @@
 
     .card:hover .card-img {
       transform: scale(1.04);
+    }
+
+    .float-preview {
+      position: absolute;
+      right: 12px;
+      top: 52px;
+      z-index: 4;
+      width: 88px;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 3px solid rgba(255, 255, 255, .88);
+      box-shadow: 0 18px 34px rgba(15, 23, 42, .24);
+      opacity: 0;
+      transform: translate3d(12px, 12px, 26px) scale(.82) rotate(8deg);
+      transition: opacity .18s ease, transform .22s ease;
+      pointer-events: none;
+    }
+
+    .card:hover .float-preview {
+      opacity: 1;
+      transform: translate3d(0, 0, 26px) scale(1) rotate(5deg);
     }
 
     .badge {
@@ -1496,6 +1608,7 @@
       card.innerHTML = `
         <div class="card-media">
           <img class="card-img" src="${escapeHtml(safeImage(item.image_url))}" alt="${escapeHtml(item.title)}">
+          <img class="float-preview" src="${escapeHtml(safeImage(item.image_url))}" alt="">
           <div class="badge"><i data-lucide="badge-check"></i>${escapeHtml(item.category)}</div>
         </div>
         <div class="card-body">
@@ -1907,6 +2020,45 @@
       }, 80);
     }
 
+    function bindMotionEffects() {
+      let raf = 0;
+      window.addEventListener("pointermove", event => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const x = Math.round((event.clientX / window.innerWidth) * 100);
+          const y = Math.round((event.clientY / window.innerHeight) * 100);
+          document.documentElement.style.setProperty("--mx", `${x}%`);
+          document.documentElement.style.setProperty("--my", `${y}%`);
+        });
+      }, { passive: true });
+
+      document.addEventListener("pointermove", event => {
+        const card = event.target.closest?.(".card");
+        if (!card) return;
+
+        const rect = card.getBoundingClientRect();
+        const px = (event.clientX - rect.left) / rect.width;
+        const py = (event.clientY - rect.top) / rect.height;
+        const tiltY = (px - .5) * 8;
+        const tiltX = (.5 - py) * 8;
+
+        card.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
+        card.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
+        card.style.setProperty("--card-x", `${Math.round(px * 100)}%`);
+        card.style.setProperty("--card-y", `${Math.round(py * 100)}%`);
+      }, { passive: true });
+
+      document.addEventListener("pointerout", event => {
+        const card = event.target.closest?.(".card");
+        if (!card || card.contains(event.relatedTarget)) return;
+        card.style.removeProperty("--tilt-x");
+        card.style.removeProperty("--tilt-y");
+        card.style.removeProperty("--card-x");
+        card.style.removeProperty("--card-y");
+      });
+    }
+
     async function logout() {
       await supabase.auth.signOut();
       currentUser = null;
@@ -1958,6 +2110,7 @@
       document.getElementById("backHomeBtn").addEventListener("click", () => showScreen("home"));
       createForm.addEventListener("submit", handleCreateSubmit);
       profileForm.addEventListener("submit", handleProfileSubmit);
+      bindMotionEffects();
       promoCodeBtn.addEventListener("click", activatePromo);
       promoCodeInput.addEventListener("keydown", event => {
         if (event.key === "Enter") {
