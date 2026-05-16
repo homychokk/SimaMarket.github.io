@@ -348,42 +348,6 @@
       max-width: 680px;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, auto);
-      gap: 10px;
-    }
-
-    .stat {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px;
-      align-items: center;
-      min-width: 128px;
-      padding: 12px;
-      background: rgba(255, 255, 255, .76);
-      border: 1px solid rgba(226, 232, 240, .9);
-      border-radius: var(--radius);
-      color: #334155;
-    }
-
-    .stat i {
-      color: var(--blue);
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 15px;
-      color: var(--text);
-    }
-
-    .stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 2px;
-    }
-
     .toolbar {
       display: flex;
       align-items: center;
@@ -759,12 +723,42 @@
     }
 
     .profile-card {
+      position: relative;
       display: grid;
       gap: 14px;
       padding: 18px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface-2);
+    }
+
+    .profile-edit-toggle {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: var(--blue);
+      background: #fff;
+      border: 1px solid #bfdbfe;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .profile-edit-toggle:hover {
+      transform: translateY(-1px) rotate(18deg);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .profile-form-wrap {
+      display: none;
+    }
+
+    .profile-form-wrap.active {
+      display: block;
+      animation: fadeUp .22s ease both;
     }
 
     .avatar {
@@ -781,6 +775,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      padding-right: 42px;
     }
 
     .profile-name {
@@ -805,6 +800,98 @@
       border: 3px solid #fff;
       box-shadow: var(--soft-shadow);
       flex: 0 0 auto;
+    }
+
+    .avatar-drop {
+      display: grid;
+      gap: 8px;
+      place-items: center;
+      min-height: 120px;
+      padding: 14px;
+      border: 1px dashed #93c5fd;
+      border-radius: var(--radius);
+      background: #eff6ff;
+      color: #1d4ed8;
+      text-align: center;
+      font-weight: 800;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .avatar-drop.dragover {
+      background: #dbeafe;
+      border-color: var(--blue);
+      transform: scale(1.01);
+    }
+
+    .avatar-drop small {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .seller-mini {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .seller-mini img {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      flex: 0 0 auto;
+    }
+
+    .seller-mini span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .message-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, .58);
+      backdrop-filter: blur(12px);
+    }
+
+    .message-modal.active {
+      display: flex;
+      animation: fadeUp .18s ease both;
+    }
+
+    .message-card {
+      width: min(520px, 100%);
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .message-card .icon-btn {
+      color: var(--text);
+      background: #f1f5f9;
+    }
+
+    .message-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
     }
 
     .promo-box {
@@ -1049,10 +1136,6 @@
         grid-template-columns: 1fr;
       }
 
-      .stats {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
       .grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -1077,10 +1160,6 @@
 
       .hero-strip {
         padding: 18px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
       }
 
       .toolbar {
@@ -1144,11 +1223,6 @@
             <h1 class="hero-title">Купить и продать рядом</h1>
             <p class="hero-copy">Чистая витрина объявлений с быстрым поиском, личным кабинетом и публикацией за минуту.</p>
           </div>
-          <div class="stats" aria-label="Преимущества">
-            <div class="stat"><i data-lucide="shield-check"></i><div><strong>Auth</strong><span>Supabase</span></div></div>
-            <div class="stat"><i data-lucide="zap"></i><div><strong>SPA</strong><span>Без перезагрузки</span></div></div>
-            <div class="stat"><i data-lucide="smartphone"></i><div><strong>Mobile</strong><span>Адаптивно</span></div></div>
-          </div>
         </div>
 
         <div class="toolbar">
@@ -1192,6 +1266,7 @@
 
           <div class="profile-layout">
             <aside class="profile-card">
+              <button class="profile-edit-toggle" id="profileEditToggle" type="button" aria-label="Редактировать профиль"><i data-lucide="settings"></i></button>
               <div class="avatar-row">
                 <img class="avatar" id="profileAvatarPreview" alt="Аватар профиля">
                 <div>
@@ -1199,24 +1274,30 @@
                   <div class="meta" id="profileCityPreview">Город не указан</div>
                 </div>
               </div>
-              <form class="form" id="profileForm">
-                <label class="label">Ник
-                  <input class="input" id="profileUsername" type="text" placeholder="Например: homychokk" maxlength="40" required />
-                </label>
-                <label class="label">Ссылка на аватар
-                  <input class="input" id="profileAvatar" type="url" placeholder="https://example.com/avatar.jpg" />
-                </label>
-                <label class="label">Телефон
-                  <input class="input" id="profilePhone" type="tel" placeholder="+375 29 000-00-00" />
-                </label>
-                <label class="label">Город
-                  <input class="input" id="profileCity" type="text" placeholder="Минск" maxlength="60" />
-                </label>
-                <label class="label">О себе
-                  <textarea class="textarea" id="profileBio" placeholder="Коротко о продавце" maxlength="500"></textarea>
-                </label>
-                <button class="btn btn-primary" type="submit"><i data-lucide="save"></i> Сохранить профиль</button>
-              </form>
+              <div class="profile-form-wrap" id="profileFormWrap">
+                <form class="form" id="profileForm">
+                  <label class="label">Ник
+                    <input class="input" id="profileUsername" type="text" placeholder="Например: homychokk" maxlength="40" required />
+                  </label>
+                  <input id="profileAvatar" type="hidden" />
+                  <div class="avatar-drop" id="avatarDrop" tabindex="0">
+                    <i data-lucide="image-plus"></i>
+                    <span>Загрузить аватар</span>
+                    <small>Перетащи фото, нажми для выбора или вставь из буфера Ctrl+V</small>
+                    <input id="avatarFileInput" type="file" accept="image/*" hidden />
+                  </div>
+                  <label class="label">Телефон
+                    <input class="input" id="profilePhone" type="tel" placeholder="+375 29 000-00-00" />
+                  </label>
+                  <label class="label">Город
+                    <input class="input" id="profileCity" type="text" placeholder="Минск" maxlength="60" />
+                  </label>
+                  <label class="label">О себе
+                    <textarea class="textarea" id="profileBio" placeholder="Коротко о продавце" maxlength="500"></textarea>
+                  </label>
+                  <button class="btn btn-primary" type="submit"><i data-lucide="save"></i> Сохранить профиль</button>
+                </form>
+              </div>
               <div class="promo-box">
                 <label class="label">Промо для друзей
                   <input class="input" id="promoCodeInput" type="text" placeholder="Введите промо-код" maxlength="20" />
@@ -1290,6 +1371,21 @@
           <div class="casino-result" id="casinoResult">Введите SIMA67 в профиле и крутаните барабаны.</div>
           <div class="casino-note">Это пасхалка для друзей: виртуальные рубли, без реальных ставок, депозитов и выплат.</div>
         </div>
+      </div>
+    </div>
+
+    <div class="message-modal" id="messageModal" aria-hidden="true">
+      <div class="message-card">
+        <div class="message-head">
+          <div>
+            <h2 style="margin:0 0 6px;" id="messageTitle">Написать продавцу</h2>
+            <div class="meta" id="messageSeller">Продавец</div>
+          </div>
+          <button class="icon-btn" id="messageCloseBtn" type="button" aria-label="Закрыть"><i data-lucide="x"></i></button>
+        </div>
+        <textarea class="textarea" id="messageText" placeholder="Здравствуйте, объявление еще актуально?"></textarea>
+        <button class="btn btn-green" id="sendMessageBtn" type="button"><i data-lucide="send"></i> Отправить</button>
+        <div class="promo-hint">Пока это демо-чат: сообщение красиво отправляется на экране, без реальной доставки.</div>
       </div>
     </div>
   </div>
@@ -1398,6 +1494,15 @@
     const casinoModal = document.getElementById("casinoModal");
     const casinoResult = document.getElementById("casinoResult");
     const spinBtn = document.getElementById("spinBtn");
+    const profileFormWrap = document.getElementById("profileFormWrap");
+    const profileEditToggle = document.getElementById("profileEditToggle");
+    const avatarDrop = document.getElementById("avatarDrop");
+    const avatarFileInput = document.getElementById("avatarFileInput");
+    const messageModal = document.getElementById("messageModal");
+    const messageTitle = document.getElementById("messageTitle");
+    const messageSeller = document.getElementById("messageSeller");
+    const messageText = document.getElementById("messageText");
+    const sendMessageBtn = document.getElementById("sendMessageBtn");
     const slotNodes = [
       document.getElementById("slotOne"),
       document.getElementById("slotTwo"),
@@ -1405,6 +1510,7 @@
     ];
     const slotSymbols = ["7", "S", "₽", "★", "💎", "BAR", "67"];
     const promoPrizes = [100, 250, 500, 777, 1200, 2026, 3000, 5000, 6666];
+    let currentMessageContext = null;
 
     function refreshIcons() {
       if (window.lucide) {
@@ -1464,6 +1570,18 @@
       return url && url.trim()
         ? url.trim()
         : `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(seed)}&backgroundColor=2563eb,10b981&textColor=ffffff`;
+    }
+
+    function shortSellerName(item) {
+      if (item.seller?.username) return item.seller.username;
+      if (currentUser && item.user_id === currentUser.id && currentProfile?.username) return currentProfile.username;
+      return "Продавец";
+    }
+
+    function sellerAvatarForItem(item) {
+      if (item.seller?.avatar_url) return item.seller.avatar_url;
+      if (currentUser && item.user_id === currentUser.id && currentProfile?.avatar_url) return currentProfile.avatar_url;
+      return "";
     }
 
     function defaultUsername(user) {
@@ -1568,6 +1686,35 @@
       document.getElementById("profileAvatarPreview").src = safeAvatar(profile.avatar_url, profile.username || "seller");
     }
 
+    function setProfileEditOpen(isOpen) {
+      profileFormWrap.classList.toggle("active", isOpen);
+      profileEditToggle.innerHTML = isOpen ? `<i data-lucide="x"></i>` : `<i data-lucide="settings"></i>`;
+      refreshIcons();
+    }
+
+    function setAvatarDataUrl(dataUrl) {
+      document.getElementById("profileAvatar").value = dataUrl;
+      document.getElementById("profileAvatarPreview").src = safeAvatar(dataUrl, document.getElementById("profileUsername").value || "seller");
+      toast("Аватар загружен");
+    }
+
+    function readAvatarFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        toast("Нужно выбрать изображение", true);
+        return;
+      }
+
+      if (file.size > 900 * 1024) {
+        toast("Фото слишком большое. Лучше до 900 КБ.", true);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => setAvatarDataUrl(reader.result);
+      reader.onerror = () => toast("Не удалось прочитать файл", true);
+      reader.readAsDataURL(file);
+    }
+
     function renderCategoryTabs() {
       categoryTabs.innerHTML = "";
 
@@ -1615,7 +1762,10 @@
           <h3 class="card-title">${escapeHtml(item.title)}</h3>
           <div class="price">${formatPrice(item.price)}</div>
           <div class="card-bottom">
-            <div class="chip"><i data-lucide="calendar-days"></i><span>${formatDate(item.created_at)}</span></div>
+            <div class="seller-mini">
+              <img src="${escapeHtml(safeAvatar(sellerAvatarForItem(item), shortSellerName(item)))}" alt="">
+              <span>${escapeHtml(shortSellerName(item))}</span>
+            </div>
             <span class="item-action" aria-label="Смотреть"><i data-lucide="arrow-up-right"></i></span>
           </div>
         </div>
@@ -1627,6 +1777,24 @@
       });
 
       return card;
+    }
+
+    async function attachSellerProfiles(items) {
+      const ids = [...new Set(items.map(item => item.user_id).filter(Boolean))];
+      if (!ids.length) return items;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", ids);
+
+      if (error || !data) return items;
+
+      const profilesById = new Map(data.map(profile => [profile.id, profile]));
+      return items.map(item => ({
+        ...item,
+        seller: profilesById.get(item.user_id) || null
+      }));
     }
 
     async function loadItems() {
@@ -1675,8 +1843,9 @@
         return;
       }
 
-      itemsCounter.textContent = `${data.length} ${getPlural(data.length, "объявление", "объявления", "объявлений")}`;
-      data.forEach(item => itemsGrid.appendChild(createItemCard(item)));
+      const itemsWithSellers = await attachSellerProfiles(data);
+      itemsCounter.textContent = `${itemsWithSellers.length} ${getPlural(itemsWithSellers.length, "объявление", "объявления", "объявлений")}`;
+      itemsWithSellers.forEach(item => itemsGrid.appendChild(createItemCard(item)));
       refreshIcons();
     }
 
@@ -1725,7 +1894,8 @@
         return;
       }
 
-      data.forEach(item => profileItemsGrid.appendChild(createItemCard(item)));
+      const itemsWithSellers = await attachSellerProfiles(data);
+      itemsWithSellers.forEach(item => profileItemsGrid.appendChild(createItemCard(item)));
       refreshIcons();
     }
 
@@ -1791,6 +1961,7 @@
             </div>
             ${seller?.bio ? `<div class="detail-desc">${escapeHtml(seller.bio)}</div>` : ""}
             ${seller?.phone ? `<a class="btn btn-green" href="tel:${escapeHtml(seller.phone)}"><i data-lucide="phone"></i> ${escapeHtml(seller.phone)}</a>` : ""}
+            <button class="btn btn-primary" type="button" id="messageSellerBtn"><i data-lucide="message-circle"></i> Написать по объявлению</button>
             <div class="seller-id">${escapeHtml(data.user_id)}</div>
             <button class="btn btn-primary" type="button" id="copySellerBtn"><i data-lucide="copy"></i> Скопировать ID продавца</button>
           </div>
@@ -1801,6 +1972,7 @@
         await navigator.clipboard.writeText(data.user_id);
         toast("ID продавца скопирован");
       });
+      document.getElementById("messageSellerBtn").addEventListener("click", () => openMessageModal(data, seller));
 
       refreshIcons();
     }
@@ -2020,6 +2192,32 @@
       }, 80);
     }
 
+    function openMessageModal(item, seller) {
+      currentMessageContext = { item, seller };
+      messageTitle.textContent = `Написать: ${item.title}`;
+      messageSeller.textContent = seller?.username ? `Продавец: ${seller.username}` : "Продавец";
+      messageText.value = "Здравствуйте, объявление еще актуально?";
+      messageModal.classList.add("active");
+      messageModal.setAttribute("aria-hidden", "false");
+      refreshIcons();
+    }
+
+    function closeMessageModal() {
+      messageModal.classList.remove("active");
+      messageModal.setAttribute("aria-hidden", "true");
+    }
+
+    function sendDemoMessage() {
+      if (!messageText.value.trim()) {
+        toast("Напишите текст сообщения", true);
+        return;
+      }
+
+      const seller = currentMessageContext?.seller?.username || "продавцу";
+      closeMessageModal();
+      toast(`Сообщение для ${seller} отправлено в демо-чат`);
+    }
+
     function bindMotionEffects() {
       let raf = 0;
       window.addEventListener("pointermove", event => {
@@ -2110,6 +2308,35 @@
       document.getElementById("backHomeBtn").addEventListener("click", () => showScreen("home"));
       createForm.addEventListener("submit", handleCreateSubmit);
       profileForm.addEventListener("submit", handleProfileSubmit);
+      profileEditToggle.addEventListener("click", () => setProfileEditOpen(!profileFormWrap.classList.contains("active")));
+      avatarDrop.addEventListener("click", () => avatarFileInput.click());
+      avatarDrop.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          avatarFileInput.click();
+        }
+      });
+      avatarFileInput.addEventListener("change", () => readAvatarFile(avatarFileInput.files[0]));
+      avatarDrop.addEventListener("dragover", event => {
+        event.preventDefault();
+        avatarDrop.classList.add("dragover");
+      });
+      avatarDrop.addEventListener("dragleave", () => avatarDrop.classList.remove("dragover"));
+      avatarDrop.addEventListener("drop", event => {
+        event.preventDefault();
+        avatarDrop.classList.remove("dragover");
+        readAvatarFile(event.dataTransfer.files[0]);
+      });
+      document.addEventListener("paste", event => {
+        if (!profileFormWrap.classList.contains("active")) return;
+        const item = [...event.clipboardData.items].find(entry => entry.type.startsWith("image/"));
+        if (item) readAvatarFile(item.getAsFile());
+      });
+      document.getElementById("messageCloseBtn").addEventListener("click", closeMessageModal);
+      messageModal.addEventListener("click", event => {
+        if (event.target === messageModal) closeMessageModal();
+      });
+      sendMessageBtn.addEventListener("click", sendDemoMessage);
       bindMotionEffects();
       promoCodeBtn.addEventListener("click", activatePromo);
       promoCodeInput.addEventListener("keydown", event => {
