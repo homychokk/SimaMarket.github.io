@@ -4,164 +4,567 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SimaMarket</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #111827;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --blue: #2563eb;
+      --blue-2: #1d4ed8;
+      --green: #10b981;
+      --green-2: #059669;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --shadow: 0 18px 45px rgba(15, 23, 42, .10);
+      --soft-shadow: 0 10px 28px rgba(15, 23, 42, .08);
+      --radius: 8px;
+    }
+
     * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(180deg, #eef5ff 0, rgba(238, 245, 255, 0) 310px),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
     }
-    button, input, textarea, select { font: inherit; }
-    button { cursor: pointer; border: none; }
-    .app { min-height: 100vh; }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
     .header {
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
+      background: rgba(255, 255, 255, .92);
+      border-bottom: 1px solid rgba(226, 232, 240, .9);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
+      backdrop-filter: blur(14px);
     }
+
     .header-inner {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 14px 16px;
       display: grid;
-      grid-template-columns: auto 1fr auto auto;
+      grid-template-columns: auto minmax(240px, 1fr) auto auto;
       gap: 12px;
       align-items: center;
     }
+
     .logo {
-      font-weight: 800;
-      font-size: 24px;
-      color: #2563eb;
-      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       padding: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0;
       white-space: nowrap;
     }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      box-shadow: 0 12px 24px rgba(37, 99, 235, .26);
+    }
+
+    .logo-mark i,
+    .btn i,
+    .field-icon i,
+    .stat i,
+    .chip i,
+    .item-action i,
+    .detail-meta i {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.3;
+    }
+
     .search-row {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 8px;
     }
-    .input, .textarea, .select {
+
+    .search-shell {
+      position: relative;
+    }
+
+    .search-shell .input {
+      padding-left: 42px;
+    }
+
+    .field-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      display: grid;
+      place-items: center;
+    }
+
+    .input,
+    .textarea,
+    .select {
       width: 100%;
-      border: 1px solid #d1d5db;
-      background: #fff;
-      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius);
       padding: 12px 14px;
-      color: #111827;
+      color: var(--text);
       outline: none;
-      transition: border-color .18s ease, box-shadow .18s ease;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
     }
-    .input:focus, .textarea:focus, .select:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #94a3b8;
     }
-    .textarea { min-height: 130px; resize: vertical; }
+
+    .input:focus,
+    .textarea:focus,
+    .select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+    }
+
+    .textarea {
+      min-height: 132px;
+      resize: vertical;
+    }
+
     .btn {
-      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: var(--radius);
       padding: 12px 16px;
-      font-weight: 700;
-      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      min-height: 46px;
+      font-weight: 800;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
       white-space: nowrap;
+      user-select: none;
     }
+
     .btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+      box-shadow: var(--soft-shadow);
     }
-    .btn-primary { color: #fff; background: #2563eb; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-green { color: #fff; background: #16a34a; }
-    .btn-green:hover { background: #15803d; }
-    .btn-light { color: #1f2937; background: #eef2f7; }
-    .btn-danger { color: #fff; background: #dc2626; }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-2);
+    }
+
+    .btn-green {
+      color: #fff;
+      background: var(--green);
+    }
+
+    .btn-green:hover {
+      background: var(--green-2);
+    }
+
+    .btn-light {
+      color: #334155;
+      background: #eef2f7;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-light:hover {
+      color: var(--blue);
+      background: #fff;
+      border-color: #bfdbfe;
+    }
+
+    .btn-danger {
+      color: #fff;
+      background: var(--red);
+    }
+
     .main {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 22px 16px 48px;
+      padding: 22px 16px 54px;
     }
-    .screen { display: none; }
-    .screen.active { display: block; }
+
+    .screen {
+      display: none;
+      animation: fadeUp .28s ease both;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-strip {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      margin: 4px 0 20px;
+      padding: 22px;
+      background:
+        linear-gradient(135deg, rgba(37, 99, 235, .11), rgba(16, 185, 129, .12)),
+        var(--surface);
+      border: 1px solid rgba(191, 219, 254, .8);
+      border-radius: var(--radius);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 10px;
+    }
+
+    .stat {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: center;
+      min-width: 128px;
+      padding: 12px;
+      background: rgba(255, 255, 255, .76);
+      border: 1px solid rgba(226, 232, 240, .9);
+      border-radius: var(--radius);
+      color: #334155;
+    }
+
+    .stat i {
+      color: var(--blue);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
     .toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 18px;
       flex-wrap: wrap;
     }
-    .category-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tab {
-      padding: 10px 14px;
-      border-radius: 999px;
-      color: #374151;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      font-weight: 700;
+
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .tab.active { color: #fff; background: #2563eb; border-color: #2563eb; }
+
+    .tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      color: #475569;
+      background: rgba(255, 255, 255, .86);
+      border: 1px solid var(--line);
+      font-weight: 800;
+      transition: transform .18s ease, box-shadow .18s ease, color .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .tab:hover {
+      transform: translateY(-1px);
+      border-color: #bfdbfe;
+      color: var(--blue);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, .07);
+    }
+
+    .tab.active {
+      color: #fff;
+      background: var(--blue);
+      border-color: var(--blue);
+      box-shadow: 0 12px 24px rgba(37, 99, 235, .22);
+    }
+
+    .tab i {
+      width: 16px;
+      height: 16px;
+    }
+
+    .toolbar-note {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
     }
+
     .card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
       overflow: hidden;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, .04);
     }
+
     .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 30px rgba(15, 23, 42, .12);
-      border-color: #c7d2fe;
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+      border-color: #bfdbfe;
     }
+
+    .card-media {
+      position: relative;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
     .card-img {
       width: 100%;
       aspect-ratio: 4 / 3;
       object-fit: cover;
-      background: #e5e7eb;
       display: block;
+      transition: transform .35s ease;
     }
-    .card-body { padding: 13px; }
+
+    .card:hover .card-img {
+      transform: scale(1.04);
+    }
+
+    .badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 9px;
+      border-radius: 999px;
+      color: #0f172a;
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid rgba(226, 232, 240, .8);
+      font-size: 12px;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+
+    .badge i {
+      width: 14px;
+      height: 14px;
+      color: var(--amber);
+    }
+
+    .card-body {
+      padding: 14px;
+    }
+
     .card-title {
-      margin: 0 0 8px;
+      margin: 0 0 10px;
       font-size: 16px;
-      line-height: 1.3;
-      color: #111827;
+      line-height: 1.32;
+      color: var(--text);
       min-height: 42px;
+      overflow-wrap: anywhere;
     }
+
     .price {
-      color: #16a34a;
-      font-size: 19px;
-      font-weight: 800;
-      margin-bottom: 8px;
+      color: #047857;
+      font-size: 20px;
+      font-weight: 950;
+      margin-bottom: 10px;
+      letter-spacing: 0;
     }
-    .meta { color: #6b7280; font-size: 13px; }
+
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      color: #475569;
+      font-weight: 700;
+    }
+
+    .chip span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .item-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      color: var(--blue);
+      background: #eff6ff;
+      transition: background .18s ease, color .18s ease;
+      flex: 0 0 auto;
+    }
+
+    .card:hover .item-action {
+      color: #fff;
+      background: var(--blue);
+    }
+
     .panel {
       max-width: 560px;
       margin: 28px auto;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 22px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
     }
-    .panel-wide { max-width: 900px; }
-    .panel h1, .panel h2 { margin: 0 0 18px; color: #111827; }
-    .form { display: grid; gap: 12px; }
-    .auth-switch { display: flex; gap: 8px; margin-bottom: 14px; }
+
+    .panel-wide {
+      max-width: 940px;
+    }
+
+    .panel h1,
+    .panel h2 {
+      margin: 0 0 18px;
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 12px;
+    }
+
+    .label {
+      display: grid;
+      gap: 7px;
+      color: #334155;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .auth-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 5px;
+      border-radius: var(--radius);
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+    }
+
+    .auth-switch .btn {
+      min-height: 40px;
+      padding: 9px 12px;
+      box-shadow: none;
+    }
+
     .message {
       margin-top: 12px;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: var(--radius);
       background: #eff6ff;
       color: #1d4ed8;
       display: none;
+      font-weight: 700;
+      line-height: 1.45;
     }
-    .message.error { background: #fef2f2; color: #b91c1c; }
+
+    .message.error {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
     .profile-head {
       display: flex;
       justify-content: space-between;
@@ -170,54 +573,246 @@
       margin-bottom: 18px;
       flex-wrap: wrap;
     }
+
     .detail {
       display: grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: 1.15fr .85fr;
       gap: 24px;
       align-items: start;
     }
+
     .detail-img {
       width: 100%;
-      border-radius: 8px;
-      background: #e5e7eb;
+      border-radius: var(--radius);
+      background: #e2e8f0;
       aspect-ratio: 4 / 3;
       object-fit: cover;
+      box-shadow: var(--shadow);
     }
+
     .detail-box {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 20px;
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--soft-shadow);
     }
-    .detail-title { margin: 0 0 12px; font-size: 30px; line-height: 1.15; }
-    .detail-desc { line-height: 1.6; white-space: pre-wrap; }
-    .empty {
-      padding: 28px;
-      text-align: center;
-      background: #fff;
-      border: 1px dashed #cbd5e1;
-      border-radius: 8px;
-      color: #64748b;
+
+    .detail-title {
+      margin: 0 0 12px;
+      font-size: clamp(25px, 3vw, 34px);
+      line-height: 1.12;
+      overflow-wrap: anywhere;
     }
-    .small-link {
-      background: none;
-      color: #2563eb;
-      padding: 0;
+
+    .detail-desc {
+      line-height: 1.65;
+      white-space: pre-wrap;
+      color: #334155;
+    }
+
+    .detail-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
       font-weight: 700;
     }
-    @media (max-width: 900px) {
-      .header-inner { grid-template-columns: 1fr; }
-      .search-row { grid-template-columns: 1fr; }
-      .grid { grid-template-columns: repeat(2, 1fr); }
-      .detail { grid-template-columns: 1fr; }
+
+    .seller-box {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
     }
-    @media (max-width: 520px) {
-      .grid { grid-template-columns: 1fr; }
-      .toolbar { align-items: stretch; }
-      .category-tabs { width: 100%; }
-      .tab { flex: 1; text-align: center; }
-      .detail-title { font-size: 24px; }
-      .btn { width: 100%; }
+
+    .seller-id {
+      padding: 11px 12px;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: #334155;
+      word-break: break-all;
+      font-size: 13px;
+      border: 1px solid var(--line);
+    }
+
+    .empty {
+      padding: 30px;
+      text-align: center;
+      background: rgba(255, 255, 255, .88);
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .small-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 38px;
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--blue);
+      border: 1px solid #bfdbfe;
+      padding: 8px 12px;
+      font-weight: 900;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .small-link:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .skeleton {
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .skeleton-img,
+    .skeleton-line {
+      background: linear-gradient(90deg, #e2e8f0, #f8fafc, #e2e8f0);
+      background-size: 220% 100%;
+      animation: shimmer 1.1s infinite linear;
+    }
+
+    .skeleton-img {
+      aspect-ratio: 4 / 3;
+    }
+
+    .skeleton-body {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .skeleton-line {
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    @keyframes shimmer {
+      to { background-position: -220% 0; }
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      max-width: min(420px, calc(100vw - 36px));
+      display: grid;
+      gap: 10px;
+    }
+
+    .toast-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 13px 14px;
+      border-radius: var(--radius);
+      background: #0f172a;
+      color: #fff;
+      box-shadow: var(--shadow);
+      animation: toastIn .22s ease both;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .toast-item.error {
+      background: #991b1b;
+    }
+
+    .toast-item i {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .header-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .detail {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .main {
+        padding: 16px 12px 42px;
+      }
+
+      .header-inner {
+        padding: 12px;
+      }
+
+      .hero-strip {
+        padding: 18px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .category-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tab {
+        justify-content: center;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-switch {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -225,21 +820,43 @@
   <div class="app">
     <header class="header">
       <div class="header-inner">
-        <button class="logo" id="logoBtn">SimaMarket</button>
+        <button class="logo" id="logoBtn" type="button" aria-label="На главную">
+          <span class="logo-mark"><i data-lucide="store"></i></span>
+          <span>SimaMarket</span>
+        </button>
+
         <div class="search-row">
-          <input class="input" id="searchInput" type="search" placeholder="Поиск по объявлениям" />
-          <button class="btn btn-primary" id="searchBtn">Найти</button>
+          <div class="search-shell">
+            <span class="field-icon"><i data-lucide="search"></i></span>
+            <input class="input" id="searchInput" type="search" placeholder="Найти iPhone, диван, велосипед" />
+          </div>
+          <button class="btn btn-primary" id="searchBtn" type="button"><i data-lucide="sparkles"></i> Найти</button>
         </div>
-        <button class="btn btn-green" id="createBtn">Подать объявление</button>
-        <button class="btn btn-light" id="authProfileBtn">Войти</button>
+
+        <button class="btn btn-green" id="createBtn" type="button"><i data-lucide="plus-circle"></i> Подать</button>
+        <button class="btn btn-light" id="authProfileBtn" type="button"><i data-lucide="user"></i> Войти</button>
       </div>
     </header>
 
     <main class="main">
       <section class="screen active" id="homeScreen">
+        <div class="hero-strip">
+          <div>
+            <h1 class="hero-title">Купить и продать рядом</h1>
+            <p class="hero-copy">Чистая витрина объявлений с быстрым поиском, личным кабинетом и публикацией за минуту.</p>
+          </div>
+          <div class="stats" aria-label="Преимущества">
+            <div class="stat"><i data-lucide="shield-check"></i><div><strong>Auth</strong><span>Supabase</span></div></div>
+            <div class="stat"><i data-lucide="zap"></i><div><strong>SPA</strong><span>Без перезагрузки</span></div></div>
+            <div class="stat"><i data-lucide="smartphone"></i><div><strong>Mobile</strong><span>Адаптивно</span></div></div>
+          </div>
+        </div>
+
         <div class="toolbar">
           <div class="category-tabs" id="categoryTabs"></div>
+          <div class="toolbar-note" id="itemsCounter">Загрузка</div>
         </div>
+
         <div class="grid" id="itemsGrid"></div>
         <div class="empty" id="emptyHome" style="display:none;">Объявления не найдены</div>
       </section>
@@ -248,13 +865,17 @@
         <div class="panel">
           <h1 id="authTitle">Вход</h1>
           <div class="auth-switch">
-            <button class="btn btn-primary" id="loginModeBtn">Вход</button>
-            <button class="btn btn-light" id="registerModeBtn">Регистрация</button>
+            <button class="btn btn-primary" id="loginModeBtn" type="button"><i data-lucide="log-in"></i> Вход</button>
+            <button class="btn btn-light" id="registerModeBtn" type="button"><i data-lucide="user-plus"></i> Регистрация</button>
           </div>
           <form class="form" id="authForm">
-            <input class="input" id="authEmail" type="email" placeholder="Email" required />
-            <input class="input" id="authPassword" type="password" placeholder="Пароль" minlength="6" required />
-            <button class="btn btn-green" type="submit" id="authSubmitBtn">Войти</button>
+            <label class="label">Email
+              <input class="input" id="authEmail" type="email" placeholder="name@example.com" required />
+            </label>
+            <label class="label">Пароль
+              <input class="input" id="authPassword" type="password" placeholder="Минимум 6 символов" minlength="6" required />
+            </label>
+            <button class="btn btn-green" type="submit" id="authSubmitBtn"><i data-lucide="arrow-right"></i> Войти</button>
           </form>
           <div class="message" id="authMessage"></div>
         </div>
@@ -267,8 +888,9 @@
               <h1>Личный кабинет</h1>
               <div class="meta" id="profileEmail"></div>
             </div>
-            <button class="btn btn-danger" id="logoutBtn">Выйти</button>
+            <button class="btn btn-danger" id="logoutBtn" type="button"><i data-lucide="log-out"></i> Выйти</button>
           </div>
+
           <h2>Мои объявления</h2>
           <div class="grid" id="profileItemsGrid"></div>
           <div class="empty" id="emptyProfile" style="display:none;">У вас пока нет объявлений</div>
@@ -279,23 +901,37 @@
         <div class="panel">
           <h1>Новое объявление</h1>
           <form class="form" id="createForm">
-            <input class="input" id="itemTitle" type="text" placeholder="Название" required maxlength="120" />
-            <input class="input" id="itemPrice" type="number" placeholder="Цена" required min="0" step="1" />
-            <select class="select" id="itemCategory" required></select>
-            <textarea class="textarea" id="itemDescription" placeholder="Описание" required maxlength="2000"></textarea>
-            <input class="input" id="itemImageUrl" type="url" placeholder="Ссылка на фото" />
-            <button class="btn btn-green" type="submit">Опубликовать</button>
+            <label class="label">Название
+              <input class="input" id="itemTitle" type="text" placeholder="Например: MacBook Air M2" required maxlength="120" />
+            </label>
+            <div class="form-grid">
+              <label class="label">Категория
+                <select class="select" id="itemCategory" required></select>
+              </label>
+              <label class="label">Цена
+                <input class="input" id="itemPrice" type="number" placeholder="0" required min="0" step="1" />
+              </label>
+            </div>
+            <label class="label">Описание
+              <textarea class="textarea" id="itemDescription" placeholder="Состояние, комплект, район, детали сделки" required maxlength="2000"></textarea>
+            </label>
+            <label class="label">Ссылка на фото
+              <input class="input" id="itemImageUrl" type="url" placeholder="https://example.com/photo.jpg" />
+            </label>
+            <button class="btn btn-green" type="submit"><i data-lucide="send"></i> Опубликовать</button>
           </form>
           <div class="message" id="createMessage"></div>
         </div>
       </section>
 
       <section class="screen" id="detailScreen">
-        <button class="small-link" id="backHomeBtn">Назад к объявлениям</button>
+        <button class="small-link" id="backHomeBtn" type="button"><i data-lucide="arrow-left"></i> Назад к объявлениям</button>
         <div style="height:16px;"></div>
         <div class="detail" id="detailContent"></div>
       </section>
     </main>
+
+    <div class="toast" id="toast"></div>
   </div>
 
   <script type="module">
@@ -306,7 +942,18 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const categories = ["Все", "Транспорт", "Недвижимость", "Электроника", "Одежда", "Дом", "Услуги", "Работа", "Хобби"];
+    const categories = [
+      { name: "Все", icon: "layout-grid" },
+      { name: "Транспорт", icon: "car" },
+      { name: "Недвижимость", icon: "home" },
+      { name: "Электроника", icon: "smartphone" },
+      { name: "Одежда", icon: "shirt" },
+      { name: "Дом", icon: "sofa" },
+      { name: "Услуги", icon: "wrench" },
+      { name: "Работа", icon: "briefcase-business" },
+      { name: "Хобби", icon: "palette" }
+    ];
+
     let currentUser = null;
     let currentCategory = "Все";
     let authMode = "login";
@@ -330,11 +977,20 @@
     const createForm = document.getElementById("createForm");
     const itemCategory = document.getElementById("itemCategory");
     const detailContent = document.getElementById("detailContent");
+    const itemsCounter = document.getElementById("itemsCounter");
+    const toastRoot = document.getElementById("toast");
+
+    function refreshIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
 
     function showScreen(name) {
       Object.values(screens).forEach(screen => screen.classList.remove("active"));
       screens[name].classList.add("active");
       window.scrollTo({ top: 0, behavior: "smooth" });
+      refreshIcons();
     }
 
     function showMessage(element, text, isError = false) {
@@ -348,12 +1004,28 @@
       element.style.display = "none";
     }
 
+    function toast(text, isError = false) {
+      const node = document.createElement("div");
+      node.className = isError ? "toast-item error" : "toast-item";
+      node.innerHTML = `<i data-lucide="${isError ? "circle-alert" : "check-circle-2"}"></i><span>${escapeHtml(text)}</span>`;
+      toastRoot.appendChild(node);
+      refreshIcons();
+      setTimeout(() => node.remove(), 3600);
+    }
+
     function formatPrice(value) {
       return new Intl.NumberFormat("ru-RU", {
         style: "currency",
         currency: "RUB",
         maximumFractionDigits: 0
       }).format(Number(value || 0));
+    }
+
+    function formatDate(value) {
+      return new Intl.DateTimeFormat("ru-RU", {
+        day: "numeric",
+        month: "short"
+      }).format(new Date(value));
     }
 
     function safeImage(url) {
@@ -371,72 +1043,140 @@
         .replaceAll("'", "&#039;");
     }
 
+    function setButtonLoading(button, isLoading, loadingText = "Загрузка") {
+      if (!button) return;
+      if (isLoading) {
+        button.dataset.oldHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = `<i data-lucide="loader-circle"></i> ${loadingText}`;
+      } else {
+        button.disabled = false;
+        if (button.dataset.oldHtml) button.innerHTML = button.dataset.oldHtml;
+      }
+      refreshIcons();
+    }
+
+    function renderSkeleton(target, count = 8) {
+      target.innerHTML = "";
+      for (let i = 0; i < count; i += 1) {
+        const node = document.createElement("div");
+        node.className = "skeleton";
+        node.innerHTML = `
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line" style="width: 90%;"></div>
+            <div class="skeleton-line" style="width: 55%;"></div>
+            <div class="skeleton-line" style="width: 72%;"></div>
+          </div>
+        `;
+        target.appendChild(node);
+      }
+    }
+
     function renderCategoryTabs() {
       categoryTabs.innerHTML = "";
+
       categories.forEach(category => {
         const button = document.createElement("button");
-        button.className = category === currentCategory ? "tab active" : "tab";
-        button.textContent = category;
+        button.className = category.name === currentCategory ? "tab active" : "tab";
+        button.type = "button";
+        button.innerHTML = `<i data-lucide="${category.icon}"></i><span>${escapeHtml(category.name)}</span>`;
         button.addEventListener("click", async () => {
-          currentCategory = category;
+          currentCategory = category.name;
           renderCategoryTabs();
           await loadItems();
         });
         categoryTabs.appendChild(button);
       });
+
+      refreshIcons();
     }
 
     function renderCategoryOptions() {
       itemCategory.innerHTML = "";
-      categories.filter(category => category !== "Все").forEach(category => {
-        const option = document.createElement("option");
-        option.value = category;
-        option.textContent = category;
-        itemCategory.appendChild(option);
-      });
+
+      categories
+        .filter(category => category.name !== "Все")
+        .forEach(category => {
+          const option = document.createElement("option");
+          option.value = category.name;
+          option.textContent = category.name;
+          itemCategory.appendChild(option);
+        });
     }
 
     function createItemCard(item) {
       const card = document.createElement("article");
       card.className = "card";
       card.tabIndex = 0;
+
       card.innerHTML = `
-        <img class="card-img" src="${escapeHtml(safeImage(item.image_url))}" alt="${escapeHtml(item.title)}">
+        <div class="card-media">
+          <img class="card-img" src="${escapeHtml(safeImage(item.image_url))}" alt="${escapeHtml(item.title)}">
+          <div class="badge"><i data-lucide="badge-check"></i>${escapeHtml(item.category)}</div>
+        </div>
         <div class="card-body">
           <h3 class="card-title">${escapeHtml(item.title)}</h3>
           <div class="price">${formatPrice(item.price)}</div>
-          <div class="meta">${escapeHtml(item.category)}</div>
+          <div class="card-bottom">
+            <div class="chip"><i data-lucide="calendar-days"></i><span>${formatDate(item.created_at)}</span></div>
+            <span class="item-action" aria-label="Смотреть"><i data-lucide="arrow-up-right"></i></span>
+          </div>
         </div>
       `;
+
       card.addEventListener("click", () => loadItemDetail(item.id));
       card.addEventListener("keydown", event => {
         if (event.key === "Enter") loadItemDetail(item.id);
       });
+
       return card;
     }
 
     async function loadItems() {
-      itemsGrid.innerHTML = "";
+      itemsCounter.textContent = "Загрузка";
       emptyHome.style.display = "none";
+      renderSkeleton(itemsGrid, 8);
 
-      let query = supabase.from("items").select("*").order("created_at", { ascending: false });
+      let query = supabase
+        .from("items")
+        .select("*")
+        .order("created_at", { ascending: false });
+
       const search = searchInput.value.trim();
 
       if (search) query = query.ilike("title", `%${search}%`);
       if (currentCategory !== "Все") query = query.eq("category", currentCategory);
 
       const { data, error } = await query;
+      itemsGrid.innerHTML = "";
+
       if (error) {
+        itemsCounter.textContent = "Ошибка";
         emptyHome.textContent = "Ошибка загрузки объявлений: " + error.message;
         emptyHome.style.display = "block";
+        toast(error.message, true);
         return;
       }
+
       if (!data || data.length === 0) {
+        itemsCounter.textContent = "0 объявлений";
         emptyHome.textContent = "Объявления не найдены";
         emptyHome.style.display = "block";
         return;
       }
+
+      itemsCounter.textContent = `${data.length} ${getPlural(data.length, "объявление", "объявления", "объявлений")}`;
       data.forEach(item => itemsGrid.appendChild(createItemCard(item)));
+      refreshIcons();
+    }
+
+    function getPlural(number, one, few, many) {
+      const mod10 = number % 10;
+      const mod100 = number % 100;
+      if (mod10 === 1 && mod100 !== 11) return one;
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+      return many;
     }
 
     async function loadProfileItems() {
@@ -449,32 +1189,46 @@
       }
 
       document.getElementById("profileEmail").textContent = currentUser.email;
+      renderSkeleton(profileItemsGrid, 4);
+
       const { data, error } = await supabase
         .from("items")
         .select("*")
         .eq("user_id", currentUser.id)
         .order("created_at", { ascending: false });
 
+      profileItemsGrid.innerHTML = "";
+
       if (error) {
         emptyProfile.textContent = "Ошибка загрузки ваших объявлений: " + error.message;
         emptyProfile.style.display = "block";
+        toast(error.message, true);
         return;
       }
+
       if (!data || data.length === 0) {
         emptyProfile.textContent = "У вас пока нет объявлений";
         emptyProfile.style.display = "block";
         return;
       }
+
       data.forEach(item => profileItemsGrid.appendChild(createItemCard(item)));
+      refreshIcons();
     }
 
     async function loadItemDetail(id) {
       detailContent.innerHTML = "<div class='empty'>Загрузка объявления...</div>";
       showScreen("detail");
 
-      const { data, error } = await supabase.from("items").select("*").eq("id", id).single();
+      const { data, error } = await supabase
+        .from("items")
+        .select("*")
+        .eq("id", id)
+        .single();
+
       if (error) {
         detailContent.innerHTML = `<div class="empty">Ошибка загрузки: ${escapeHtml(error.message)}</div>`;
+        toast(error.message, true);
         return;
       }
 
@@ -483,58 +1237,87 @@
         <div class="detail-box">
           <h1 class="detail-title">${escapeHtml(data.title)}</h1>
           <div class="price">${formatPrice(data.price)}</div>
-          <p class="meta">Категория: ${escapeHtml(data.category)}</p>
-          <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0;">
+          <p class="detail-meta"><i data-lucide="tag"></i> ${escapeHtml(data.category)}</p>
+          <p class="detail-meta"><i data-lucide="calendar-days"></i> Опубликовано ${formatDate(data.created_at)}</p>
+          <div style="height:18px;"></div>
           <div class="detail-desc">${escapeHtml(data.description)}</div>
-          <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0;">
-          <h2 style="margin:0 0 10px;">Контакты продавца</h2>
-          <p class="meta">ID продавца:</p>
-          <p style="word-break:break-all;margin-top:4px;">${escapeHtml(data.user_id)}</p>
-          <p class="meta">Для тестовой версии контакт привязан к аккаунту Supabase.</p>
+          <div class="seller-box">
+            <h2 style="margin:0;">Продавец</h2>
+            <div class="seller-id">${escapeHtml(data.user_id)}</div>
+            <button class="btn btn-primary" type="button" id="copySellerBtn"><i data-lucide="copy"></i> Скопировать ID продавца</button>
+          </div>
         </div>
       `;
+
+      document.getElementById("copySellerBtn").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(data.user_id);
+        toast("ID продавца скопирован");
+      });
+
+      refreshIcons();
     }
 
     async function handleAuthSubmit(event) {
       event.preventDefault();
+
+      const submitButton = document.getElementById("authSubmitBtn");
       const message = document.getElementById("authMessage");
       const email = document.getElementById("authEmail").value.trim();
       const password = document.getElementById("authPassword").value;
+
       hideMessage(message);
+      setButtonLoading(submitButton, true, authMode === "register" ? "Создаем" : "Входим");
 
       if (authMode === "register") {
         const { error } = await supabase.auth.signUp({ email, password });
+        setButtonLoading(submitButton, false);
+
         if (error) {
           showMessage(message, error.message, true);
+          toast(error.message, true);
           return;
         }
-        showMessage(message, "Регистрация успешна. Если в Supabase включено подтверждение email, проверьте почту.");
+
+        showMessage(message, "Регистрация успешна. Если включено подтверждение email, проверьте почту.");
+        toast("Регистрация создана");
         return;
       }
 
       const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setButtonLoading(submitButton, false);
+
       if (error) {
         showMessage(message, error.message, true);
+        toast(error.message, true);
         return;
       }
 
       showMessage(message, "Вход выполнен");
+      toast("Вы вошли в аккаунт");
       showScreen("home");
       await loadItems();
     }
 
     function setAuthMode(mode) {
       authMode = mode;
+
       const isLogin = mode === "login";
       document.getElementById("authTitle").textContent = isLogin ? "Вход" : "Регистрация";
-      document.getElementById("authSubmitBtn").textContent = isLogin ? "Войти" : "Зарегистрироваться";
+      document.getElementById("authSubmitBtn").innerHTML = isLogin
+        ? `<i data-lucide="arrow-right"></i> Войти`
+        : `<i data-lucide="user-plus"></i> Зарегистрироваться`;
+
       document.getElementById("loginModeBtn").className = isLogin ? "btn btn-primary" : "btn btn-light";
       document.getElementById("registerModeBtn").className = isLogin ? "btn btn-light" : "btn btn-primary";
+
       hideMessage(document.getElementById("authMessage"));
+      refreshIcons();
     }
 
     async function handleCreateSubmit(event) {
       event.preventDefault();
+
+      const submitButton = createForm.querySelector("button[type='submit']");
       const message = document.getElementById("createMessage");
       hideMessage(message);
 
@@ -553,14 +1336,19 @@
         user_id: currentUser.id
       };
 
+      setButtonLoading(submitButton, true, "Публикуем");
       const { error } = await supabase.from("items").insert(payload);
+      setButtonLoading(submitButton, false);
+
       if (error) {
         showMessage(message, error.message, true);
+        toast(error.message, true);
         return;
       }
 
       createForm.reset();
       showMessage(message, "Объявление опубликовано");
+      toast("Объявление опубликовано");
       currentCategory = "Все";
       renderCategoryTabs();
       await loadItems();
@@ -570,7 +1358,8 @@
     async function logout() {
       await supabase.auth.signOut();
       currentUser = null;
-      authProfileBtn.textContent = "Войти";
+      authProfileBtn.innerHTML = `<i data-lucide="user"></i> Войти`;
+      toast("Вы вышли из аккаунта");
       showScreen("home");
       await loadItems();
     }
@@ -580,26 +1369,34 @@
         showScreen("home");
         await loadItems();
       });
+
       document.getElementById("searchBtn").addEventListener("click", loadItems);
+
       searchInput.addEventListener("keydown", event => {
         if (event.key === "Enter") loadItems();
       });
+
       createBtn.addEventListener("click", () => {
         if (!currentUser) {
+          toast("Сначала войдите в аккаунт");
           showScreen("auth");
           return;
         }
+
         hideMessage(document.getElementById("createMessage"));
         showScreen("create");
       });
+
       authProfileBtn.addEventListener("click", async () => {
         if (!currentUser) {
           showScreen("auth");
           return;
         }
+
         await loadProfileItems();
         showScreen("profile");
       });
+
       document.getElementById("authForm").addEventListener("submit", handleAuthSubmit);
       document.getElementById("loginModeBtn").addEventListener("click", () => setAuthMode("login"));
       document.getElementById("registerModeBtn").addEventListener("click", () => setAuthMode("register"));
@@ -611,10 +1408,16 @@
     async function initSession() {
       const { data } = await supabase.auth.getSession();
       currentUser = data.session?.user || null;
-      authProfileBtn.textContent = currentUser ? "Профиль" : "Войти";
+      authProfileBtn.innerHTML = currentUser
+        ? `<i data-lucide="circle-user-round"></i> Профиль`
+        : `<i data-lucide="user"></i> Войти`;
+
       supabase.auth.onAuthStateChange((_event, session) => {
         currentUser = session?.user || null;
-        authProfileBtn.textContent = currentUser ? "Профиль" : "Войти";
+        authProfileBtn.innerHTML = currentUser
+          ? `<i data-lucide="circle-user-round"></i> Профиль`
+          : `<i data-lucide="user"></i> Войти`;
+        refreshIcons();
       });
     }
 
@@ -624,6 +1427,7 @@
       bindEvents();
       setAuthMode("login");
       await initSession();
+      refreshIcons();
       await loadItems();
     }
 
