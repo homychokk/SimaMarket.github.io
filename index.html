@@ -1539,7 +1539,6 @@
         </div>
 
         <div style="display:flex;align-items:center;gap:10px;">
-          <span class="online-badge" id="onlineBadge"><span class="online-dot"></span><span id="onlineCount">247</span> онлайн</span>
           <button class="btn btn-green" id="createBtn" type="button"><i data-lucide="plus-circle"></i> Подать</button>
           <button class="btn btn-light" id="authProfileBtn" type="button"><i data-lucide="user"></i> Войти</button>
           <button class="theme-btn" id="themeBtn" type="button" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
@@ -1557,9 +1556,10 @@
         </div>
 
         <div class="toolbar">
-          <div class="category-tabs" id="categoryTabs"></div>
+          <button class="btn btn-light" id="categoriesToggleBtn" type="button" style="border-radius:999px; font-weight:800;"><i data-lucide="list-filter"></i> Выбрать категорию</button>
           <div class="toolbar-note" id="itemsCounter">Загрузка</div>
         </div>
+        <div class="category-tabs" id="categoryTabs" style="display:none; margin-bottom:18px;"></div>
 
         <div class="grid" id="itemsGrid"></div>
         <div class="empty" id="emptyHome" style="display:none;">Объявления не найдены</div>
@@ -1670,12 +1670,47 @@
             <label class="label">Описание
               <textarea class="textarea" id="itemDescription" placeholder="Состояние, комплект, район, детали сделки" required maxlength="2000"></textarea>
             </label>
-            <label class="label">Ссылка на фото
-              <input class="input" id="itemImageUrl" type="url" placeholder="https://example.com/photo.jpg" />
+            <label class="label">Фотография
+              <input id="itemImageBase64" type="hidden" />
+              <div class="avatar-drop" id="itemImageDrop" tabindex="0" style="position:relative; overflow:hidden;">
+                <i data-lucide="image-plus"></i>
+                <span>Загрузить фото товара</span>
+                <small>Перетащи фото, нажми для выбора или вставь Ctrl+V</small>
+                <input id="itemImageFileInput" type="file" accept="image/*" hidden />
+                <img id="itemImagePreview" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:var(--radius); position:absolute; inset:0; z-index:2;" />
+              </div>
             </label>
             <button class="btn btn-green" type="submit"><i data-lucide="send"></i> Опубликовать</button>
           </form>
           <div class="message" id="createMessage"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="sellerScreen">
+        <button class="small-link" id="backFromSellerBtn" type="button"><i data-lucide="arrow-left"></i> Назад</button>
+        <div style="height:16px;"></div>
+        <div class="panel panel-wide">
+          <div class="profile-layout">
+            <aside class="profile-card">
+              <div class="avatar-row">
+                <img class="avatar" id="sellerScreenAvatar" alt="Аватар">
+                <div>
+                  <h2 class="profile-name" id="sellerScreenName">Продавец</h2>
+                  <div class="meta" id="sellerScreenCity">Город не указан</div>
+                </div>
+              </div>
+              <div class="detail-desc" id="sellerScreenBio" style="margin-top:14px;"></div>
+              <div style="margin-top:14px; display:grid; gap:8px;">
+                <button class="btn btn-primary" type="button" id="sellerScreenMessageBtn"><i data-lucide="message-circle"></i> Написать</button>
+                <a class="btn btn-green" id="sellerScreenPhoneBtn" href="#" style="display:none;"><i data-lucide="phone"></i> <span id="sellerScreenPhone"></span></a>
+              </div>
+            </aside>
+            <section>
+              <h2>Объявления продавца</h2>
+              <div class="grid" id="sellerItemsGrid"></div>
+              <div class="empty" id="emptySellerItems" style="display:none;">Нет объявлений</div>
+            </section>
+          </div>
         </div>
       </section>
 
@@ -1918,7 +1953,8 @@
       auth: document.getElementById("authScreen"),
       profile: document.getElementById("profileScreen"),
       create: document.getElementById("createScreen"),
-      detail: document.getElementById("detailScreen")
+      detail: document.getElementById("detailScreen"),
+      seller: document.getElementById("sellerScreen")
     };
 
     const itemsGrid = document.getElementById("itemsGrid");
@@ -2393,6 +2429,45 @@
       };
     }
 
+    async function showSellerScreen(seller, userId) {
+      document.getElementById("sellerScreenName").textContent = seller?.username || "Продавец SimaMarket";
+      document.getElementById("sellerScreenCity").textContent = seller?.city || "Город не указан";
+      document.getElementById("sellerScreenAvatar").src = safeAvatar(seller?.avatar_url, seller?.username || userId);
+      document.getElementById("sellerScreenBio").textContent = seller?.bio || "";
+
+      const phoneBtn = document.getElementById("sellerScreenPhoneBtn");
+      if (seller?.phone) {
+        document.getElementById("sellerScreenPhone").textContent = seller.phone;
+        phoneBtn.href = `tel:${escapeHtml(seller.phone)}`;
+        phoneBtn.style.display = "inline-flex";
+      } else {
+        phoneBtn.style.display = "none";
+      }
+
+      document.getElementById("sellerScreenMessageBtn").onclick = () => openMessageModal({ title: "Объявления продавца" }, seller);
+      
+      const grid = document.getElementById("sellerItemsGrid");
+      const empty = document.getElementById("emptySellerItems");
+      grid.innerHTML = "<div class='empty'>Загрузка объявлений...</div>";
+      empty.style.display = "none";
+      showScreen("seller");
+
+      const { data, error } = await supabase
+        .from("items")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      grid.innerHTML = "";
+      if (error || !data || data.length === 0) {
+        empty.style.display = "block";
+      } else {
+        empty.style.display = "none";
+        data.forEach(item => grid.appendChild(createItemCard({ ...item, seller })));
+      }
+      refreshIcons();
+    }
+
     function renderItemDetail(data, seller) {
       const isOwnItem = currentUser && data.user_id === currentUser.id;
       const buyBtn = !isOwnItem
@@ -2411,10 +2486,10 @@
           <div style="height:12px;"></div>
           ${buyBtn}
           <div class="seller-box">
-            <div class="seller-head">
+            <div class="seller-head" id="detailSellerClick" style="cursor:pointer; transition:opacity .2s;" onmouseover="this.style.opacity=.8" onmouseout="this.style.opacity=1">
               <img class="seller-avatar" src="${escapeHtml(safeAvatar(seller?.avatar_url, seller?.username || data.user_id))}" alt="${escapeHtml(seller?.username || 'Продавец')}">
               <div>
-                <h2 style="margin:0;">${escapeHtml(seller?.username || 'Продавец SimaMarket')}</h2>
+                <h2 style="margin:0;">${escapeHtml(seller?.username || 'Продавец SimaMarket')} <i data-lucide="chevron-right" style="width:16px;height:16px;vertical-align:-2px;color:var(--blue);"></i></h2>
                 <div class="meta">${escapeHtml(seller?.city || 'Город не указан')}</div>
               </div>
             </div>
@@ -2432,6 +2507,7 @@
         toast("ID продавца скопирован");
       });
       document.getElementById("messageSellerBtn").addEventListener("click", () => openMessageModal(data, seller));
+      document.getElementById("detailSellerClick").addEventListener("click", () => showSellerScreen(seller, data.user_id));
       if (!isOwnItem) {
         document.getElementById("buyOnlineBtn").addEventListener("click", () => openCheckout(data, seller));
       }
@@ -2546,7 +2622,7 @@
         price: Number(document.getElementById("itemPrice").value),
         category: document.getElementById("itemCategory").value,
         description: document.getElementById("itemDescription").value.trim(),
-        image_url: document.getElementById("itemImageUrl").value.trim() || null,
+        image_url: document.getElementById("itemImageBase64").value.trim() || null,
         user_id: currentUser.id
       };
 
@@ -2761,6 +2837,48 @@
 
         hideMessage(document.getElementById("createMessage"));
         showScreen("create");
+      });
+
+      document.getElementById("categoriesToggleBtn").addEventListener("click", () => {
+        const tabs = document.getElementById("categoryTabs");
+        tabs.style.display = tabs.style.display === "none" ? "flex" : "none";
+      });
+
+      document.getElementById("backFromSellerBtn").addEventListener("click", () => {
+        showScreen("detail");
+      });
+
+      const itemImgDrop = document.getElementById("itemImageDrop");
+      const itemImgFile = document.getElementById("itemImageFileInput");
+      const itemImgBase64 = document.getElementById("itemImageBase64");
+      const itemImgPreview = document.getElementById("itemImagePreview");
+
+      function readItemImage(file) {
+        if (!file || !file.type.startsWith("image/")) return;
+        if (file.size > 1024 * 1024 * 1.5) {
+          toast("Файл слишком большой! Лимит 1.5 МБ", true);
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+          itemImgBase64.value = e.target.result;
+          itemImgPreview.src = e.target.result;
+          itemImgPreview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+      itemImgDrop.addEventListener("click", () => itemImgFile.click());
+      itemImgDrop.addEventListener("dragover", e => { e.preventDefault(); itemImgDrop.classList.add("dragover"); });
+      itemImgDrop.addEventListener("dragleave", () => itemImgDrop.classList.remove("dragover"));
+      itemImgDrop.addEventListener("drop", e => {
+        e.preventDefault();
+        itemImgDrop.classList.remove("dragover");
+        if (e.dataTransfer.files?.length) readItemImage(e.dataTransfer.files[0]);
+      });
+      itemImgFile.addEventListener("change", () => readItemImage(itemImgFile.files[0]));
+      itemImgDrop.addEventListener("paste", e => {
+        const item = Array.from(e.clipboardData.items).find(i => i.type.startsWith("image/"));
+        if (item) readItemImage(item.getAsFile());
       });
 
       authProfileBtn.addEventListener("click", async () => {
