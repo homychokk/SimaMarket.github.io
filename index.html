@@ -3190,18 +3190,6 @@
       setTimeout(() => logo.classList.remove("glitching"), 2200);
     }
 
-    // === FAKE ONLINE COUNTER ===
-    function startOnlineCounter() {
-      const el = document.getElementById("onlineCount");
-      let base = 220 + Math.floor(Math.random() * 60);
-      el.textContent = base;
-      setInterval(() => {
-        const delta = Math.floor(Math.random() * 7) - 3;
-        base = Math.max(180, Math.min(350, base + delta));
-        el.textContent = base;
-      }, 4000);
-    }
-
     async function init() {
       // Restore theme
       const saved = localStorage.getItem("sima-theme");
@@ -3217,7 +3205,6 @@
       await initSession();
       refreshIcons();
       await loadItems();
-      startOnlineCounter();
     }
 
     init();
