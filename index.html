@@ -2565,6 +2565,7 @@
       if (error) {
         showMessage(message, error.message, true);
         toast(error.message, true);
+        alert("Ошибка входа: " + error.message);
         return;
       }
 
@@ -2955,6 +2956,16 @@
         if (e.target === document.getElementById("secretOverlay"))
           document.getElementById("secretOverlay").classList.remove("active");
       });
+
+      // === MODALS ===
+      const checkoutCloseBtn = document.getElementById("checkoutCloseBtn");
+      if (checkoutCloseBtn) checkoutCloseBtn.addEventListener("click", closeCheckout);
+      
+      const topupCloseBtn = document.getElementById("topupCloseBtn");
+      if (topupCloseBtn) topupCloseBtn.addEventListener("click", closeTopup);
+      
+      const topupOpenBtn = document.getElementById("topupOpenBtn");
+      if (topupOpenBtn) topupOpenBtn.addEventListener("click", openTopup);
 
       // === KONAMI CODE ===
       const konamiSeq = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
